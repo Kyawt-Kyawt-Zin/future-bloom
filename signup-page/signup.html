@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      /* to send background wallpaper behind  */
+      .bg-image {
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+    </style>
+    <title>Sign Up</title>
+  </head>
+  <body>
+    <!-- background  -->
+    <div
+      id="bg"
+      class="postion-fixed top-0 start-0 w-100 h-100 z-n1 bg-image"
+    ></div>
+
+    <!-- overlay  -->
+
+    <div
+      id="overlay"
+      class="postion-fixed top-0 start-0 w-100 h-100 z-n1"
+    ></div>
+
+    <div class="container mt-5">
+      <h2>Sign Up</h2>
+
+      <!-- make selection for your Role  -->
+      <select name="selectRole" id="role" class="form-select mb-3">
+        <option value="">Select Role</option>
+        <option value="parent">Parent</option>
+        <option value="teacher">Teacher</option>
+        <option value="student">student</option>
+      </select>
+
+      <!-- Gender selection for students  -->
+      <div id="studentOptions" style="display: none">
+        <select name="gender" id="gender" class="form-select">
+          <option value="">Select Gender</option>
+          <option value="boy">Boy</option>
+          <option value="girl">Girl</option>
+        </select>
+      </div>
+
+      <button class="btn btn-success mt-3" onclick="signup()">Sign Up</button>
+    </div>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"
+      integrity="sha512-6sSYJqDreZRZGkJ3b+YfdhB3MzmuP9R7X1QZ6g5aIXhRvR1Y/N/P47jmnkENm7YL3oqsmI6AK+V6AD99uWDnIw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <script src="signup.js"></script>
+  </body>
+</html>
