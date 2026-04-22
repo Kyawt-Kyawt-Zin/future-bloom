@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- bootstrap cdn  -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+
+    <!-- bootstrap icon cdn  -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+    <!-- external css  -->
+
+    <link rel="stylesheet" href="../assets/css/homepage.css" />
+    <link
+      rel="shortcut icon"
+      href="images/FutureBloomLogo.png"
+      type="image/x-icon"
+    />
+    <title>&#127793; FutureBloom||Sign Up/Log In</title>
+  </head>
+
+  <body>
+    <!-- navbar  -->
+    <nav
+      class="navbar navbar-expand-lg navbar-dark bg-transperancy sticky-top px-3"
+    >
+      <div class="container-fluid px-0">
+        <a href="#" class="navbar-brand fw-bold"
+          ><h1 class="fw-bold display-3 text-shadow">
+            <span style="font-size: 40px px-2">&#127793; </span>FutureBloom
+          </h1></a
+        >
+      </div>
+    </nav>
+
+    <div class="container mt-5">
+      <h2>Sign Up</h2>
+
+      <!-- make selection for your Role  -->
+      <div class="row">
+        <div class="col-md-6- col-lg-4">
+          <select
+            name="selectRole"
+            id="role"
+            class="form-select w-50 mb-3"
+            onchange="handleRoleChange()"
+          >
+            <option value="" selected disabled>--- Select Role ---</option>
+            <option value="parent">Parent</option>
+            <option value="teacher">Teacher</option>
+            <option value="student">Student</option>
+          </select>
+
+          <!-- Gender selection for students  -->
+          <div id="genderBox" class="mb-3 d-none">
+            <label class="form-label">Select Gender</label>
+
+            <select name="gender" id="gender" class="form-select">
+              <option value="">Select Gender</option>
+              <option value="boy">Boy</option>
+              <option value="girl">Girl</option>
+            </select>
+          </div>
+
+          <button class="btn btn-success w-30 mt-3" onclick="signup()">
+            Sign Up
+          </button>
+        </div><div class="col-md-6- col-lg-4">
+          
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+    <!-- js connect  -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"
+      integrity="sha512-6sSYJqDreZRZGkJ3b+YfdhB3MzmuP9R7X1QZ6g5aIXhRvR1Y/N/P47jmnkENm7YL3oqsmI6AK+V6AD99uWDnIw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <script src="signup.js"></script>
+  </body>
+</html>

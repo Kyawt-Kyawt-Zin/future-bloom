@@ -9,8 +9,7 @@ h2,
 h3,
 h4,
 h5,
-h6,
-.navbar {
+h6 {
   font-family: "Montserrat", sans-serif;
   font-weight: 700;
   color: black;
@@ -22,10 +21,14 @@ h6,
   color: black;
 }
 
+.nav-link:hover {
+  color: darkorchid;
+}
+
 body,
 .bg-home {
   margin: 0;
   min-height: 100vh;
-  background: url(../images/rainbow.jpg) no-repeat center center fixed;
+  background: url(../../images/rainbow.jpg) no-repeat center center fixed;
   background-size: cover;
 }
