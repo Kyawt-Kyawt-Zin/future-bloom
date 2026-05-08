@@ -32,3 +32,27 @@ body,
   background: url(../../images/rainbow.jpg) no-repeat center center fixed;
   background-size: cover;
 }
+.bg-parent {
+  margin: 0;
+  min-height: 100vh;
+  background: url(../../images/radient-blue.jpg) no-repeat center center fixed;
+  background-size: cover;
+}
+.bg-teacher {
+  margin: 0;
+  min-height: 100vh;
+  background: url(../../images/green.jpg) no-repeat center center fixed;
+  background-size: cover;
+}
+.bg-student-boy {
+  margin: 0;
+  min-height: 100vh;
+  background: url(../../images/skyblue.jpg) no-repeat center center fixed;
+  background-size: cover;
+}
+.bg-student-girl {
+  margin: 0;
+  min-height: 100vh;
+  background: url(../../images/pink-flower.jpg) no-repeat center center fixed;
+  background-size: cover;
+}
