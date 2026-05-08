@@ -58,56 +58,57 @@
           <span class="navbar-toggler-icon"></span>
         </button>
 
-        <!-- Menu  -->
         <div class="collapse navbar-collapse" id="navMenu">
-          <ul class="navbar-nav me-auto">
-            <li class="nav-item">
-              <a href="#guidelines" class="nav-link">Guidelines</a>
-            </li>
-            <li class="nav-item">
-              <a href="#advantages" class="nav-link">Advantages</a>
-            </li>
-          </ul>
-
           <div class="d-flex flex-column flex-lg-row gap-2 ms-auto">
-            <a href="login.html" class="btn btn-warning rounded-3 px-3"
-              >Login</a
-            >
-
-            <a
-              href="/signup-page/index.html"
-              class="btn btn-success rounded-3 px-3"
-              >Sign Up</a
+            <a href="index.html" class="btn btn-success rounded-pill me-auto"
+              >Back To Home</a
             >
           </div>
         </div>
       </div>
     </nav>
 
-    <!-- guidelines  -->
-    <section id="guidelines" class="container mt-5">
-      <h2>How to Use</h2>
-      <ul>
-        <li>Sign up as Parent, Teacher or Student</li>
-        <li>Upload and review the exam-records anytime.</li>
-        <li>Reminder for upcoming classes.</li>
-        <li>Notes for Teachers and Parents discussion.</li>
-        <li>Student logs study activities</li>
-        <li>Parents monitor progress</li>
-      </ul>
-    </section>
+    <!-- login form  -->
+    <div class="container w-80 my-3 py-3 rounded-3 bg-transparent">
+      <div class="d-flex flex-column flex-lg-row gap-2">
+        <div class="col-md-12 col-lg-10">
+          <h2 class="text-center">Login</h2>
+          <p class="text-center">
+            Don't have an account?
+            <a href="../signup-page/index.html">Sign Up</a>
+          </p>
+          <!-- error message box  -->
+          <form id="loginForm" onsubmit="login(event)">
+            <!-- username/email -->
+            <div class="mb-3 text-center">
+              <input
+                type="text"
+                id="loginInput"
+                class="form-control rounded-3"
+                placeholder="Enter username or email"
+              />
+            </div>
 
-    <section id="advantages" class="container mt-5">
-      <h2>Advantages</h2>
-      <ul>
-        <li>Track daily habits</li>
-        <li>Manage study time and leave own space for relaxation</li>
-        <li>Focus on subjects which need more effort</li>
-        <li>Never missed the classes and reschedule</li>
-        <li>Encourage consistency</li>
-        <li>Easy for kids to use</li>
-      </ul>
-    </section>
+            <!-- password -->
+            <div class="mb-3">
+              <input
+                type="password"
+                id="loginPassword"
+                class="form-control rounded-3"
+                placeholder="Enter password"
+              />
+            </div>
+
+            <!-- button -->
+            <div class="text-center mt-4">
+              <button type="submit" class="btn btn-success rounded-3 px-5 py-2">
+                Login
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
     <!-- footer section -->
     <footer class="text-center border-top p-3 mt-5">
