@@ -97,6 +97,8 @@ inputFormElement.addEventListener("submit", (event) => {
     password,
     role,
     gender: role === "student" ? gender : null,
+    studentId:
+      role === "student" ? "STU" + Math.floor(Math.random() * 100000) : null,
   };
 
   // add new user
@@ -130,6 +132,7 @@ const genderBox = document.getElementById("genderBox");
 function handleRoleChange() {
   const role = document.getElementById("role").value;
   console.log("Current User Role:", role);
+
   if (role === "student") {
     genderBox.classList.remove("d-none");
   } else {

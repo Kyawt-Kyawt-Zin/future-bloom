@@ -38,12 +38,12 @@ function login(event) {
   } else if (matchedUser.role === "student") {
     // boy student
     if (matchedUser.gender === "boy") {
-      window.location.href = "../student-boy-page/index.html";
+      window.location.href = "../student-page/boy.html";
     }
 
     // girl student
     else {
-      window.location.href = "../student-girl-page/index.html";
+      window.location.href = "../student-page/girl.html";
     }
   }
 }
