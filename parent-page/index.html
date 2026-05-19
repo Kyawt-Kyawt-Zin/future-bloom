@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="../assets/css/homepage.css" />
     <link
       rel="shortcut icon"
-      href="images/FutureBloomLogo.png"
+      href="../images/FutureBloomLogo.png"
       type="image/x-icon"
     />
     <title>&#127793; FutureBloom</title>
@@ -41,34 +41,37 @@
     ></div>
 
     <!-- navbar  -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-light sticky-top px-3">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top px-3">
       <div class="container-fluid px-0">
-        <a href="#" class="navbar-brand fw-bold"
-          ><h1 class="fw-bold display-3 text-shadow">
-            <span style="font-size: 40px px-2">&#127793; </span>FutureBloom
-          </h1></a
-        >
-      </div>
+        <a href="#" class="navbar-brand fw-bold">
+          <h1 class="fw-bold fs-2 text-shadow m-0">
+            <span style="font-size: 32px">&#127793;</span>
+            FutureBloom
+          </h1>
+        </a>
 
-      <button
-        type="button"
-        class="navbar-toggler"
-        data-bs-toggle="collapse"
-        data-bs-target="#navMenu"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="d-flex flex-column flex-lg-row gap-2 ms-auto">
-        <a
-          href="../student-page/child-profile.html"
-          class="btn btn-warning rounded-3 px-3"
-          >Add Child</a
+        <button
+          type="button"
+          class="navbar-toggler"
+          data-bs-toggle="collapse"
+          data-bs-target="#navMenu"
         >
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-        <a href="../index.html" class="btn btn-success rounded-3 px-3"
-          >Log Out</a
-        >
+        <div class="collapse navbar-collapse" id="navMenu">
+          <div class="d-flex flex-column flex-lg-row gap-2 ms-auto">
+            <a
+              href="../student-page/child-profile.html"
+              class="btn btn-warning rounded-3 px-3"
+              >Add Child</a
+            >
+
+            <a href="../index.html" class="btn btn-success rounded-3 px-3"
+              >Log Out</a
+            >
+          </div>
+        </div>
       </div>
     </nav>
 
@@ -81,11 +84,11 @@
       </p>
 
       <div class="row g-4 mt-4">
-        <div class="col-md-6">
-          <div class="card h-100">
+        <div class="col-12 col-md-6">
+          <div class="card h-100 shadow-sm">
             <img
               src="../images/student-progress.jpg"
-              class="card-img-top img-fluid"
+              class="card-img-top fb-card-img"
               alt="Child Progress"
             />
             <div class="card-body">
@@ -101,11 +104,11 @@
           </div>
         </div>
 
-        <div class="col-md-6">
-          <div class="card h-100">
+        <div class="col-12 col-md-6">
+          <div class="card h-100 shadow-sm">
             <img
               src="../images/studying-student.jpg"
-              class="card-img-top"
+              class="card-img-top fb-card-img"
               alt="Invest Hours"
             />
             <div class="card-body">
@@ -120,11 +123,11 @@
         </div>
       </div>
       <div class="row g-4 mt-4">
-        <div class="col-md-6">
-          <div class="card h-100">
+        <div class="col-12 col-md-6">
+          <div class="card h-100 shadow-sm">
             <img
               src="../images/parent-teacher-meeting.jpg"
-              class="card-img-top"
+              class="card-img-top fb-card-img"
               alt="Parent Support"
             />
             <div class="card-body">
@@ -142,11 +145,11 @@
           </div>
         </div>
 
-        <div class="col-md-6">
-          <div class="card h-100">
+        <div class="col-12 col-md-6">
+          <div class="card h-100 shadow-sm">
             <img
-              src="../images/parent-resources.jpg"
-              class="card-img-top"
+              src="../images/rainbow.jpg"
+              class="card-img-top fb-card-img"
               alt="Parent Resources"
             />
             <div class="card-body">
@@ -182,7 +185,6 @@
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/homepage.js"></script>
     <script src="../assets/js/parent.js"></script>
   </body>

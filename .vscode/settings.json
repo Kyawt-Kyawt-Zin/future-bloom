@@ -1,0 +1,7 @@
+{
+  "git.blame.editorDecoration.disableHover": true,
+  "git.blame.editorDecoration.enabled": false,
+  "git.blame.ignoreWhitespace": true,
+  "files.autoSave": "onWindowChange",
+  "chat.disableAIFeatures": false
+}

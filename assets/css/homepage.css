@@ -2,6 +2,7 @@
 body {
   font-family: "Open Sans", sans-serif;
   color: black;
+  min-height: 100vh;
 }
 
 h1,
@@ -54,4 +55,14 @@ h6 {
   min-height: 100vh;
   background: url(../../images/pink-flower.jpg) no-repeat center center fixed;
   background-size: cover;
+}
+
+.navbar-brand h1 {
+  line-height: 1.2;
+  white-space: normal;
+}
+
+.fb-card-img {
+  height: 220px;
+  object-fit: cover;
 }

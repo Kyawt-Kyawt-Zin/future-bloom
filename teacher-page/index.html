@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="../assets/css/homepage.css" />
     <link
       rel="shortcut icon"
-      href="images/FutureBloomLogo.png"
+      href="../images/FutureBloomLogo.png"
       type="image/x-icon"
     />
     <title>&#127793; FutureBloom</title>
@@ -41,36 +41,141 @@
     ></div>
 
     <!-- navbar  -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-light sticky-top px-3">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top px-3">
       <div class="container-fluid px-0">
-        <a href="#" class="navbar-brand fw-bold"
-          ><h1 class="fw-bold display-3 text-shadow">
-            <span style="font-size: 40px px-2">&#127793; </span>FutureBloom
-          </h1></a
-        >
-      </div>
+        <!-- logo -->
+        <a href="#" class="navbar-brand fw-bold">
+          <h1 class="fw-bold fs-2 text-shadow m-0">
+            <span style="font-size: 32px">&#127793;</span>
+            FutureBloom
+          </h1>
+        </a>
 
-      <button
-        type="button"
-        class="navbar-toggler"
-        data-bs-toggle="collapse"
-        data-bs-target="#navMenu"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="d-flex flex-column flex-lg-row gap-2 ms-auto">
-        <a
-          href="../student-page/child-profile.html"
-          class="btn btn-warning rounded-3 px-3"
-          >Add Students</a
+        <!-- toggler -->
+        <button
+          type="button"
+          class="navbar-toggler"
+          data-bs-toggle="collapse"
+          data-bs-target="#navMenu"
         >
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-        <a href="../index.html" class="btn btn-success rounded-3 px-3"
-          >Log Out</a
-        >
+        <!-- collapsible menu -->
+        <div class="collapse navbar-collapse" id="navMenu">
+          <div class="d-flex flex-column flex-lg-row gap-2 ms-auto">
+            <a
+              href="../student-page/child-profile.html"
+              class="btn btn-warning rounded-3 px-3"
+            >
+              Add Students
+            </a>
+
+            <a href="../index.html" class="btn btn-success rounded-3 px-3">
+              Log Out
+            </a>
+          </div>
+        </div>
       </div>
     </nav>
+
+    <main class="container py-4">
+      <!-- welcome  -->
+      <div
+        id="welcomeMessage"
+        class="alert alert-success rounded-4 d-none shadow p-4 mt-4"
+      ></div>
+
+      <!-- Search Student Section will go here -->
+      <section class="card shadow rounded-4 p-3 p-md-4 mt-4">
+        <h3 class="mb-3">Search Student</h3>
+
+        <div class="row g-3">
+          <div class="col-md-8">
+            <input
+              type="text"
+              id="searchStudentId"
+              class="form-control rounded-3"
+              placeholder="Enter Student ID, example STU1001"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <button
+              id="searchStudentBtn"
+              class="btn btn-success w-100 rounded-3"
+            >
+              Search
+            </button>
+          </div>
+        </div>
+
+        <div id="studentResult" class="mt-4"></div>
+      </section>
+
+      <!-- adding schedule  -->
+      <section
+        id="scheduleSection"
+        class="card shadow rounded-4 p-3 p-md-4 mt-4 d-none"
+      >
+        <h3 class="mb-3">Add Schedule</h3>
+
+        <form id="scheduleForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="scheduleSubject" class="form-label">Subject</label>
+              <input
+                type="text"
+                id="scheduleSubject"
+                class="form-control rounded-3"
+                placeholder="Example: Mathematics"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <label for="scheduleDay" class="form-label">Day</label>
+              <select id="scheduleDay" class="form-select rounded-3">
+                <option value="">Choose day</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+                <option value="Sunday">Sunday</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label for="scheduleTime" class="form-label">Time</label>
+              <input
+                type="time"
+                id="scheduleTime"
+                class="form-control rounded-3"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <label for="scheduleDuration" class="form-label">Duration</label>
+              <input
+                type="text"
+                id="scheduleDuration"
+                class="form-control rounded-3"
+                placeholder="Example: 2 hours"
+              />
+            </div>
+
+            <div class="col-12">
+              <button class="btn btn-success rounded-3 px-4 w-100" type="submit">
+                Save Schedule
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <div id="scheduleMessage" class="mt-3"></div>
+      </section>
+    </main>
 
     <!-- footer section -->
     <footer class="text-center border-top p-3 mt-5">
@@ -92,7 +197,7 @@
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/homepage.js"></script>
+    <script src="../assets/js/teacher.js"></script>
   </body>
 </html>
