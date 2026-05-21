@@ -1,5 +1,5 @@
 console.log("teacher.js connected");
-
+let selectedStudentId = null;
 document.addEventListener("DOMContentLoaded", function () {
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   const welcomeMessage = document.getElementById("welcomeMessage");
@@ -13,8 +13,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const scheduleTime = document.getElementById("scheduleTime");
   const scheduleDuration = document.getElementById("scheduleDuration");
   const scheduleMessage = document.getElementById("scheduleMessage");
-
-  let selectedStudentId = null;
 
   if (currentUser && welcomeMessage) {
     welcomeMessage.classList.remove("d-none");
