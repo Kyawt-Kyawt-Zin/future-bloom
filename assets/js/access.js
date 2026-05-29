@@ -1,7 +1,8 @@
 console.log("access.js connected");
 
 document.addEventListener("DOMContentLoaded", function () {
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  const lastTeacherUser = JSON.parse(localStorage.getItem("lastTeacherUser"));
   const users = JSON.parse(localStorage.getItem("users")) || [];
   const params = new URLSearchParams(window.location.search);
   const studentId = params.get("studentId");
@@ -18,6 +19,13 @@ document.addEventListener("DOMContentLoaded", function () {
   const reportList = document.getElementById("reportList");
   const reportMarks = document.getElementById("reportMarks");
   const reportGrade = document.getElementById("reportGrade");
+  const backToTeacherBtn = document.getElementById("backToTeacherBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  if (!currentUser && lastTeacherUser) {
+    currentUser = lastTeacherUser;
+    localStorage.setItem("currentUser", JSON.stringify(lastTeacherUser));
+  }
 
   const student = users.find(function (user) {
     return user.role === "student" && user.studentId === studentId;
@@ -27,6 +35,19 @@ document.addEventListener("DOMContentLoaded", function () {
     studentInfo.innerHTML = "Please login as a teacher first.";
     return;
   }
+
+  localStorage.setItem("lastTeacherUser", JSON.stringify(currentUser));
+
+  backToTeacherBtn.addEventListener("click", function () {
+    localStorage.setItem("currentUser", JSON.stringify(currentUser));
+    window.location.href = "index.html";
+  });
+
+  logoutBtn.addEventListener("click", function () {
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("lastTeacherUser");
+    window.location.href = "../index.html";
+  });
 
   if (!student) {
     studentInfo.innerHTML = "Student not found.";

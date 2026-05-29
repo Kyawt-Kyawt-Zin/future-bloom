@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
   seedUsers();
   seedTeacherStudentLinks();
   setupThemeControls();
+  setupLogoutButton();
 });
 
 function seedUsers() {
@@ -221,4 +222,31 @@ function setupThemeControls() {
   function saveTheme() {
     localStorage.setItem(themeKey, JSON.stringify(savedTheme));
   }
+}
+
+function setupLogoutButton() {
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  if (!logoutBtn) return;
+
+  logoutBtn.addEventListener("click", function () {
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("lastTeacherUser");
+    window.location.href = getHomePath();
+  });
+}
+
+function getHomePath() {
+  const path = window.location.pathname;
+
+  if (
+    path.includes("/teacher-page/") ||
+    path.includes("/student-page/") ||
+    path.includes("/parent-page/") ||
+    path.includes("/signup-page/")
+  ) {
+    return "../index.html";
+  }
+
+  return "index.html";
 }

@@ -1,11 +1,18 @@
 console.log("teacher.js connected");
 
 document.addEventListener("DOMContentLoaded", function () {
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  const lastTeacherUser = JSON.parse(localStorage.getItem("lastTeacherUser"));
+
+  if (!currentUser && lastTeacherUser) {
+    currentUser = lastTeacherUser;
+    localStorage.setItem("currentUser", JSON.stringify(lastTeacherUser));
+  }
   const welcomeMessage = document.getElementById("welcomeMessage");
   const studentTableBody = document.getElementById("studentTableBody");
   const addStudentBtn = document.getElementById("addStudentBtn");
   const studentPagination = document.getElementById("studentPagination");
+  const logoutBtn = document.getElementById("logoutBtn");
 
   const studentsPerPage = 5;
   let currentPage = 1;
@@ -31,6 +38,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   renderStudents();
+
+  logoutBtn.addEventListener("click", function () {
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("lastTeacherUser");
+    window.location.href = "../index.html";
+  });
 
   addStudentBtn.addEventListener("click", function () {
     const enteredStudentId = prompt("Enter Student ID:");
@@ -219,6 +232,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (event.target.classList.contains("access-btn")) {
       const studentId = event.target.dataset.studentId;
+      localStorage.setItem("lastTeacherUser", JSON.stringify(currentUser));
       window.location.href = `access.html?studentId=${studentId}`;
     }
   });
