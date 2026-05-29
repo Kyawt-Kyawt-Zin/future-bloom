@@ -6,6 +6,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const studentScheduleList = document.getElementById("studentScheduleList");
   const studentAssignmentList = document.getElementById("studentAssignmentList");
   const studentReportList = document.getElementById("studentReportList");
+  const submitAssignmentDemoBtn = document.getElementById(
+    "submitAssignmentDemoBtn",
+  );
+  const submitAssignmentMessage = document.getElementById(
+    "submitAssignmentMessage",
+  );
 
   if (!currentUser || !welcomeMessage) return;
 
@@ -30,6 +36,16 @@ document.addEventListener("DOMContentLoaded", function () {
   `;
 
   renderStudentRecords();
+
+  if (submitAssignmentDemoBtn) {
+    submitAssignmentDemoBtn.addEventListener("click", function () {
+      submitAssignmentMessage.innerHTML = `
+        <div class="alert alert-info rounded-3 mb-0">
+          Demo feature: assignment file upload will be available in a future version.
+        </div>
+      `;
+    });
+  }
 
   function renderStudentRecords() {
     const schedules = JSON.parse(localStorage.getItem("schedules")) || [];

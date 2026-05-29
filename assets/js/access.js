@@ -38,6 +38,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   localStorage.setItem("lastTeacherUser", JSON.stringify(currentUser));
 
+  setupAccessFormButtons();
+
   backToTeacherBtn.addEventListener("click", function () {
     localStorage.setItem("currentUser", JSON.stringify(currentUser));
     window.location.href = "index.html";
@@ -64,6 +66,43 @@ document.addEventListener("DOMContentLoaded", function () {
   reportMarks.addEventListener("input", function () {
     reportGrade.value = calculateGrade(reportMarks.value);
   });
+
+  function setupAccessFormButtons() {
+    const formButtons = document.querySelectorAll(".access-form-btn");
+    const collapseItems = [
+      {
+        collapse: document.getElementById("scheduleCollapse"),
+        button: document.getElementById("scheduleToggleBtn"),
+      },
+      {
+        collapse: document.getElementById("assignmentCollapse"),
+        button: document.getElementById("assignmentToggleBtn"),
+      },
+      {
+        collapse: document.getElementById("reportCollapse"),
+        button: document.getElementById("reportToggleBtn"),
+      },
+    ];
+
+    collapseItems.forEach(function (item) {
+      item.collapse.addEventListener("show.bs.collapse", function () {
+        formButtons.forEach(function (button) {
+          button.classList.remove("btn-warning");
+          button.classList.add("btn-success");
+        });
+
+        item.button.classList.remove("btn-success");
+        item.button.classList.add("btn-warning");
+      });
+
+      item.collapse.addEventListener("hidden.bs.collapse", function () {
+        if (!item.collapse.classList.contains("show")) {
+          item.button.classList.remove("btn-warning");
+          item.button.classList.add("btn-success");
+        }
+      });
+    });
+  }
 
   scheduleForm.addEventListener("submit", function (event) {
     event.preventDefault();
