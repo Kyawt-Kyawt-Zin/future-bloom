@@ -66,3 +66,49 @@ h6 {
   height: 220px;
   object-fit: cover;
 }
+
+.theme-controls {
+  max-width: 360px;
+}
+
+.theme-controls .form-select {
+  min-width: 150px;
+}
+
+.fb-dark-mode {
+  color: #f8f9fa;
+}
+
+.fb-dark-mode h1,
+.fb-dark-mode h2,
+.fb-dark-mode h3,
+.fb-dark-mode h4,
+.fb-dark-mode h5,
+.fb-dark-mode h6 {
+  color: #f8f9fa;
+}
+
+.fb-dark-mode .navbar,
+.fb-dark-mode .card,
+.fb-dark-mode .alert,
+.fb-dark-mode footer {
+  background-color: #1f2933 !important;
+  color: #f8f9fa;
+}
+
+.fb-dark-mode .table {
+  --bs-table-bg: #1f2933;
+  --bs-table-color: #f8f9fa;
+  --bs-table-border-color: #4b5563;
+}
+
+.fb-dark-mode .form-control,
+.fb-dark-mode .form-select {
+  background-color: #111827;
+  border-color: #4b5563;
+  color: #f8f9fa;
+}
+
+.fb-dark-mode .form-control::placeholder {
+  color: #adb5bd;
+}

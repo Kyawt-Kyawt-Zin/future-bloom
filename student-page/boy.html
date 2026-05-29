@@ -49,6 +49,25 @@
             FutureBloom
           </h1>
         </a>
+
+        <div class="theme-controls d-flex flex-column flex-sm-row gap-2 ms-auto">
+          <select id="backgroundSelect" class="form-select form-select-sm">
+            <option value="bg-student-boy">Sky Blue</option>
+            <option value="bg-teacher">Green</option>
+            <option value="bg-student-girl">Pink Flower</option>
+            <option value="bg-home">Rainbow</option>
+            <option value="bg-parent">Blue</option>
+          </select>
+
+          <div class="form-check form-switch d-flex align-items-center gap-2">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="darkModeSwitch"
+            />
+            <label class="form-check-label" for="darkModeSwitch">Dark</label>
+          </div>
+        </div>
       </div>
     </nav>
 
@@ -58,6 +77,21 @@
         id="welcomeMessage"
         class="alert alert-success rounded-4 shadow p-4 mt-4"
       ></div>
+
+      <section class="card shadow rounded-4 p-4 mt-4">
+        <h3 class="mb-3">My Schedules</h3>
+        <div id="studentScheduleList"></div>
+      </section>
+
+      <section class="card shadow rounded-4 p-4 mt-4">
+        <h3 class="mb-3">My Assignments</h3>
+        <div id="studentAssignmentList"></div>
+      </section>
+
+      <section class="card shadow rounded-4 p-4 mt-4">
+        <h3 class="mb-3">My Report Cards</h3>
+        <div id="studentReportList"></div>
+      </section>
     </main>
     
     <!-- footer section -->
