@@ -6,14 +6,11 @@ const inputFormElement = document.getElementById("signUpForm");
 const usernameElement = document.getElementById("username");
 const emailElement = document.getElementById("email");
 const passwordElement = document.getElementById("password");
-const role = document.getElementById("role").value;
-
 const togglePasswordBtn = document.getElementById("togglePassword");
 
-togglePasswordBtn.addEventListener("click", () => {
+togglePasswordBtn.addEventListener("click", function () {
   const eyeIcon = document.getElementById("eye-icon");
-
-  let passwordType = passwordElement.getAttribute("type");
+  const passwordType = passwordElement.getAttribute("type");
 
   if (passwordType === "password") {
     passwordElement.setAttribute("type", "text");
@@ -24,42 +21,35 @@ togglePasswordBtn.addEventListener("click", () => {
   eyeIcon.classList.toggle("bi-eye");
 });
 
-// submit event
-inputFormElement.addEventListener("submit", (event) => {
+inputFormElement.addEventListener("submit", function (event) {
   event.preventDefault();
 
-  //  clear previous errors
   errorElement.innerHTML = "";
   errorElement.style.display = "none";
 
-  let errorMessages = [];
+  const errorMessages = [];
   const username = usernameElement.value.trim();
-
   const email = emailElement.value.trim();
-
   const password = passwordElement.value.trim();
-
   const role = document.getElementById("role").value;
 
-  const gender = document.getElementById("gender").value;
-
-  if (usernameElement.value === "") {
+  if (username === "") {
     errorMessages.push("Username is required");
   }
 
-  if (emailElement.value === "") {
+  if (email === "") {
     errorMessages.push("Email is required");
   }
 
-  if (passwordElement.value === "") {
+  if (password === "") {
     errorMessages.push("Password is required");
   }
 
-  if (passwordElement.value && passwordElement.value.length < 6) {
+  if (password && password.length < 6) {
     errorMessages.push("Password should be at least 6 characters!");
   }
 
-  if (passwordElement.value.length > 20) {
+  if (password.length > 20) {
     errorMessages.push("Password should be no more than 20 characters!");
   }
 
@@ -68,74 +58,50 @@ inputFormElement.addEventListener("submit", (event) => {
   }
 
   if (errorMessages.length > 0) {
-    console.log(errorMessages, typeof errorMessages);
-    let errors = errorMessages.join("<br/>");
-    console.log(errors, typeof errors);
-    errorElement.innerHTML = errors;
+    errorElement.classList.remove("alert-success");
+    errorElement.classList.add("alert-danger");
+    errorElement.innerHTML = errorMessages.join("<br/>");
     errorElement.style.display = "block";
     return;
   }
 
-  // get users array
   const users = JSON.parse(localStorage.getItem("users")) || [];
-  // for checking duplicate email registration
-  const existingUser = users.find((user) => user.email === email);
+
+  const existingUser = users.find(function (user) {
+    return user.email === email;
+  });
 
   if (existingUser) {
+    errorElement.classList.remove("alert-success");
+    errorElement.classList.add("alert-danger");
     errorElement.innerHTML = "Email already registered";
-
     errorElement.style.display = "block";
-
     return;
   }
 
-  // create user
   const user = {
     id: Date.now(),
     username,
     email,
     password,
     role,
-    gender: role === "student" ? gender : null,
-    studentId:
-      role === "student" ? "STU" + Math.floor(Math.random() * 100000) : null,
+    gender: null,
+    studentId: null,
   };
 
-  // add new user
   users.push(user);
-
-  // save
   localStorage.setItem("users", JSON.stringify(users));
 
-  // success message
   errorElement.classList.remove("alert-danger");
-
   errorElement.classList.add("alert-success");
-
   errorElement.innerHTML = "Signup successful! Redirecting to login page...";
-
   errorElement.style.display = "block";
 
-  // reset all
   inputFormElement.reset();
-  genderBox.classList.add("d-none");
 
-  // redirect after 3 seconds
-  setTimeout(() => {
+  setTimeout(function () {
     window.location.href = "../login.html";
   }, 3000);
 });
 
-const gender = document.getElementById("gender").value;
-const genderBox = document.getElementById("genderBox");
-
-function handleRoleChange() {
-  const role = document.getElementById("role").value;
-  console.log("Current User Role:", role);
-
-  if (role === "student") {
-    genderBox.classList.remove("d-none");
-  } else {
-    genderBox.classList.add("d-none");
-  }
-}
+function handleRoleChange() {}

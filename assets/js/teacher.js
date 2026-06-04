@@ -8,19 +8,47 @@ document.addEventListener("DOMContentLoaded", function () {
     currentUser = lastTeacherUser;
     localStorage.setItem("currentUser", JSON.stringify(lastTeacherUser));
   }
+
   const welcomeMessage = document.getElementById("welcomeMessage");
+  const teacherAlert = document.getElementById("teacherAlert");
+  const studentSearchInput = document.getElementById("studentSearchInput");
   const studentTableBody = document.getElementById("studentTableBody");
-  const addStudentBtn = document.getElementById("addStudentBtn");
   const studentPagination = document.getElementById("studentPagination");
+  const availableStudentSelect = document.getElementById("availableStudentSelect");
+  const confirmAddExistingStudentBtn = document.getElementById(
+    "confirmAddExistingStudentBtn",
+  );
+  const confirmCreateStudentBtn = document.getElementById(
+    "confirmCreateStudentBtn",
+  );
+  const existingStudentTab = document.getElementById("existingStudentTab");
+  const newStudentTab = document.getElementById("newStudentTab");
+  const newStudentName = document.getElementById("newStudentName");
+  const newStudentEmail = document.getElementById("newStudentEmail");
+  const newStudentGender = document.getElementById("newStudentGender");
+  const newStudentGrade = document.getElementById("newStudentGrade");
+  const confirmDeleteStudentBtn = document.getElementById(
+    "confirmDeleteStudentBtn",
+  );
+  const deleteStudentMessage = document.getElementById("deleteStudentMessage");
   const logoutBtn = document.getElementById("logoutBtn");
+
+  const addStudentModal = new bootstrap.Modal(
+    document.getElementById("addStudentModal"),
+  );
+  const deleteStudentModal = new bootstrap.Modal(
+    document.getElementById("deleteStudentModal"),
+  );
 
   const studentsPerPage = 5;
   let currentPage = 1;
+  let searchValue = "";
+  let studentIdToDelete = null;
 
   if (!currentUser || currentUser.role !== "teacher") {
-    studentTableBody.innerHTML = `
+      studentTableBody.innerHTML = `
       <tr>
-        <td colspan="3" class="text-center text-danger">
+        <td colspan="4" class="text-center text-danger">
           Please login as a teacher first.
         </td>
       </tr>
@@ -38,6 +66,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   renderStudents();
+  renderAvailableStudentOptions();
+
+  document.addEventListener("demoDataReady", function () {
+    renderStudents();
+    renderAvailableStudentOptions();
+  });
 
   logoutBtn.addEventListener("click", function () {
     localStorage.removeItem("currentUser");
@@ -45,45 +79,127 @@ document.addEventListener("DOMContentLoaded", function () {
     window.location.href = "../index.html";
   });
 
-  addStudentBtn.addEventListener("click", function () {
-    const enteredStudentId = prompt("Enter Student ID:");
-
-    if (!enteredStudentId) return;
-
-    addStudentToTeacher(enteredStudentId.trim());
+  studentSearchInput.addEventListener("input", function () {
+    searchValue = studentSearchInput.value;
+    currentPage = 1;
+    renderStudents();
   });
 
-  function getTeacherStudents() {
+  existingStudentTab.addEventListener("shown.bs.tab", function () {
+    confirmAddExistingStudentBtn.classList.remove("d-none");
+    confirmCreateStudentBtn.classList.add("d-none");
+  });
+
+  newStudentTab.addEventListener("shown.bs.tab", function () {
+    confirmAddExistingStudentBtn.classList.add("d-none");
+    confirmCreateStudentBtn.classList.remove("d-none");
+  });
+
+  confirmAddExistingStudentBtn.addEventListener("click", function () {
+    const selectedStudentId = availableStudentSelect.value;
+
+    if (!selectedStudentId) {
+      showBootstrapAlert("Please choose a student first.", "warning");
+      return;
+    }
+
+    addStudentToTeacher(selectedStudentId);
+    addStudentModal.hide();
+  });
+
+  confirmCreateStudentBtn.addEventListener("click", function () {
+    createStudentAndConnect();
+  });
+
+  confirmDeleteStudentBtn.addEventListener("click", function () {
+    if (!studentIdToDelete) return;
+
+    removeStudentFromTeacher(studentIdToDelete);
+    studentIdToDelete = null;
+    deleteStudentModal.hide();
+  });
+
+  studentTableBody.addEventListener("click", function (event) {
+    if (event.target.classList.contains("delete-student-btn")) {
+      studentIdToDelete = event.target.dataset.studentId;
+      openDeleteModal(studentIdToDelete);
+    }
+
+    if (event.target.classList.contains("access-btn")) {
+      const studentId = event.target.dataset.studentId;
+      localStorage.setItem("lastTeacherUser", JSON.stringify(currentUser));
+      window.location.href = `access.html?studentId=${studentId}`;
+    }
+  });
+
+  studentPagination.addEventListener("click", function (event) {
+    if (!event.target.classList.contains("page-btn")) return;
+
+    currentPage = Number(event.target.dataset.page);
+    renderStudents();
+  });
+
+  function getAllStudents() {
     const users = JSON.parse(localStorage.getItem("users")) || [];
+
+    return users.filter(function (user) {
+      return user.role === "student";
+    });
+  }
+
+  function getTeacherLinks() {
     const links = JSON.parse(localStorage.getItem("teacherStudentLinks")) || [];
 
-    const myLinks = links.filter(function (link) {
+    return links.filter(function (link) {
       return link.teacherId === currentUser.id;
     });
+  }
+
+  function getTeacherStudents() {
+    const students = getAllStudents();
+    const myLinks = getTeacherLinks();
 
     return myLinks
       .map(function (link) {
-        return users.find(function (user) {
-          return user.role === "student" && user.studentId === link.studentId;
+        return students.find(function (student) {
+          return student.studentId === link.studentId;
         });
       })
       .filter(Boolean);
   }
 
+  function getFilteredStudents() {
+    const normalizedSearch = normalizeText(searchValue);
+
+    if (normalizedSearch === "") {
+      return getTeacherStudents();
+    }
+
+    return getTeacherStudents().filter(function (student) {
+      const normalizedName = normalizeText(student.username);
+      const normalizedStudentId = normalizeText(student.studentId);
+
+      return (
+        normalizedName.includes(normalizedSearch) ||
+        normalizedStudentId.includes(normalizedSearch)
+      );
+    });
+  }
+
   function renderStudents() {
-    const myStudents = getTeacherStudents();
-    const totalPages = Math.ceil(myStudents.length / studentsPerPage);
+    const filteredStudents = getFilteredStudents();
+    const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
     const startIndex = (currentPage - 1) * studentsPerPage;
     const endIndex = startIndex + studentsPerPage;
-    const studentsToShow = myStudents.slice(startIndex, endIndex);
+    const studentsToShow = filteredStudents.slice(startIndex, endIndex);
 
     studentTableBody.innerHTML = "";
 
-    if (myStudents.length === 0) {
+    if (filteredStudents.length === 0) {
       studentTableBody.innerHTML = `
         <tr>
-          <td colspan="3" class="text-center">
-            No students assigned yet.
+          <td colspan="4" class="text-center">
+            No students found.
           </td>
         </tr>
       `;
@@ -96,6 +212,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <tr>
           <td>${student.username}</td>
           <td>${student.studentId}</td>
+          <td>${student.grade || "Not selected"}</td>
           <td>
             <button
               class="btn btn-primary btn-sm access-btn"
@@ -157,54 +274,149 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  function addStudentToTeacher(studentId) {
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const links = JSON.parse(localStorage.getItem("teacherStudentLinks")) || [];
-
-    const student = users.find(function (user) {
-      return (
-        user.role === "student" &&
-        user.studentId &&
-        user.studentId.toLowerCase() === studentId.toLowerCase()
-      );
+  function renderAvailableStudentOptions() {
+    const connectedStudentIds = getTeacherLinks().map(function (link) {
+      return link.studentId;
     });
 
-    if (!student) {
-      alert("No student found with this ID.");
+    const availableStudents = getAllStudents().filter(function (student) {
+      return !connectedStudentIds.includes(student.studentId);
+    });
+
+    availableStudentSelect.innerHTML = "";
+
+    if (availableStudents.length === 0) {
+      availableStudentSelect.innerHTML = `
+        <option value="">No available students</option>
+      `;
+      confirmAddExistingStudentBtn.disabled = true;
       return;
     }
 
+    confirmAddExistingStudentBtn.disabled = false;
+
+    availableStudentSelect.innerHTML = `
+      <option value="">Choose student</option>
+    `;
+
+    availableStudents.forEach(function (student) {
+      availableStudentSelect.innerHTML += `
+        <option value="${student.studentId}">
+          ${student.studentId} - ${student.username} - ${
+            student.grade || "No grade"
+          }
+        </option>
+      `;
+    });
+  }
+
+  function addStudentToTeacher(studentId) {
+    const links = JSON.parse(localStorage.getItem("teacherStudentLinks")) || [];
+
     const alreadyAdded = links.some(function (link) {
-      return (
-        link.teacherId === currentUser.id &&
-        link.studentId === student.studentId
-      );
+      return link.teacherId === currentUser.id && link.studentId === studentId;
     });
 
     if (alreadyAdded) {
-      alert("This student is already in your table.");
+      showBootstrapAlert("This student is already connected to you.", "warning");
       return;
     }
 
     links.push({
       id: Date.now(),
       teacherId: currentUser.id,
-      studentId: student.studentId,
+      studentId,
     });
 
     localStorage.setItem("teacherStudentLinks", JSON.stringify(links));
 
+    showBootstrapAlert("Student added successfully.", "success");
     currentPage = Math.ceil(getTeacherStudents().length / studentsPerPage);
     renderStudents();
+    renderAvailableStudentOptions();
   }
 
-  function deleteStudentFromTeacher(studentId) {
-    const confirmed = confirm(
-      "Are you sure you want to remove this student from your table?",
+  function createStudentAndConnect() {
+    const username = newStudentName.value.trim();
+    const email = newStudentEmail.value.trim();
+    const gender = newStudentGender.value;
+    const grade = newStudentGrade.value;
+
+    if (username === "" || email === "" || gender === "" || grade === "") {
+      showBootstrapAlert("Please fill in all new student fields.", "danger");
+      return;
+    }
+
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+
+    const emailAlreadyExists = users.some(function (user) {
+      return normalizeText(user.email) === normalizeText(email);
+    });
+
+    if (emailAlreadyExists) {
+      showBootstrapAlert("This email is already registered.", "warning");
+      return;
+    }
+
+    const newStudent = {
+      id: Date.now(),
+      username,
+      email,
+      password: "12345678",
+      role: "student",
+      gender,
+      grade,
+      studentId: createUniqueStudentId(users),
+    };
+
+    users.push(newStudent);
+    localStorage.setItem("users", JSON.stringify(users));
+
+    addStudentToTeacher(newStudent.studentId);
+    newStudentName.value = "";
+    newStudentEmail.value = "";
+    newStudentGender.value = "";
+    newStudentGrade.value = "";
+    addStudentModal.hide();
+
+    showBootstrapAlert(
+      `New student created. Student ID: <strong>${newStudent.studentId}</strong>. Grade: <strong>${newStudent.grade}</strong>. Default password: <strong>12345678</strong>.`,
+      "success",
     );
+  }
 
-    if (!confirmed) return;
+  function createUniqueStudentId(users) {
+    let studentId = "";
+    let alreadyExists = true;
 
+    while (alreadyExists) {
+      studentId = "STU" + Math.floor(10000 + Math.random() * 90000);
+
+      alreadyExists = users.some(function (user) {
+        return user.studentId === studentId;
+      });
+    }
+
+    return studentId;
+  }
+
+  function openDeleteModal(studentId) {
+    const hasExistingRecords = studentHasExistingRecords(studentId);
+
+    deleteStudentMessage.innerHTML = hasExistingRecords
+      ? `
+        This student already has schedules, assignments, or report cards.
+        Removing the student will only remove them from your table.
+        Existing records will stay saved for future access.
+      `
+      : `
+        Are you sure you want to remove this student from your table?
+      `;
+
+    deleteStudentModal.show();
+  }
+
+  function removeStudentFromTeacher(studentId) {
     const links = JSON.parse(localStorage.getItem("teacherStudentLinks")) || [];
 
     const updatedLinks = links.filter(function (link) {
@@ -215,32 +427,50 @@ document.addEventListener("DOMContentLoaded", function () {
 
     localStorage.setItem("teacherStudentLinks", JSON.stringify(updatedLinks));
 
-    const totalPages = Math.ceil(getTeacherStudents().length / studentsPerPage);
+    const totalPages = Math.ceil(getFilteredStudents().length / studentsPerPage);
 
     if (currentPage > totalPages) {
       currentPage = totalPages || 1;
     }
 
+    showBootstrapAlert("Student removed from your table.", "success");
     renderStudents();
+    renderAvailableStudentOptions();
   }
 
-  studentTableBody.addEventListener("click", function (event) {
-    if (event.target.classList.contains("delete-student-btn")) {
-      const studentId = event.target.dataset.studentId;
-      deleteStudentFromTeacher(studentId);
-    }
+  function studentHasExistingRecords(studentId) {
+    const schedules = JSON.parse(localStorage.getItem("schedules")) || [];
+    const assignments = JSON.parse(localStorage.getItem("assignments")) || [];
+    const reportCards = JSON.parse(localStorage.getItem("reportCards")) || [];
 
-    if (event.target.classList.contains("access-btn")) {
-      const studentId = event.target.dataset.studentId;
-      localStorage.setItem("lastTeacherUser", JSON.stringify(currentUser));
-      window.location.href = `access.html?studentId=${studentId}`;
-    }
-  });
+    return (
+      schedules.some(function (schedule) {
+        return schedule.studentId === studentId;
+      }) ||
+      assignments.some(function (assignment) {
+        return assignment.studentId === studentId;
+      }) ||
+      reportCards.some(function (reportCard) {
+        return reportCard.studentId === studentId;
+      })
+    );
+  }
 
-  studentPagination.addEventListener("click", function (event) {
-    if (!event.target.classList.contains("page-btn")) return;
+  function showBootstrapAlert(message, type) {
+    teacherAlert.innerHTML = `
+      <div class="alert alert-${type} alert-dismissible fade show rounded-4 shadow-sm mt-3" role="alert">
+        ${message}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+    `;
+  }
 
-    currentPage = Number(event.target.dataset.page);
-    renderStudents();
-  });
+  function normalizeText(value) {
+    return String(value).toLowerCase().replace(/\s+/g, "");
+  }
 });

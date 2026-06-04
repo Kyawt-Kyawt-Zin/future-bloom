@@ -7,97 +7,28 @@ document.addEventListener("DOMContentLoaded", function () {
     year.textContent = new Date().getFullYear();
   }
 
-  seedUsers();
-  seedTeacherStudentLinks();
+  loadDemoDataFromJson();
   setupThemeControls();
   setupLogoutButton();
+  setupBackToTopButton();
 });
 
-function seedUsers() {
-  const defaultUsers = [
-    {
-      id: 1779197744303,
-      username: "Kyawt",
-      email: "kyawt@gmail.com",
-      password: "12345678",
-      role: "parent",
-      gender: null,
-      studentId: null,
-    },
-    {
-      id: 1779197776744,
-      username: "Rozy",
-      email: "rozy@gmail.com",
-      password: "12345678",
-      role: "teacher",
-      gender: null,
-      studentId: null,
-    },
-    {
-      id: 1779197810119,
-      username: "Sofia",
-      email: "sofia@gmail.com",
-      password: "12345678",
-      role: "student",
-      gender: "girl",
-      studentId: "STU84817",
-    },
-    {
-      id: 1779197851253,
-      username: "Qasim",
-      email: "qasim@gmail.com",
-      password: "12345678",
-      role: "teacher",
-      gender: null,
-      studentId: null,
-    },
-    {
-      id: 1779197886054,
-      username: "Hein",
-      email: "hein@gmail.com",
-      password: "12345678",
-      role: "student",
-      gender: "boy",
-      studentId: "STU16217",
-    },
-    {
-      id: 1779197938328,
-      username: "Maria",
-      email: "maria@gmail.com",
-      password: "12345678",
-      role: "teacher",
-      gender: null,
-      studentId: null,
-    },
-    {
-      id: 1779197972091,
-      username: "George",
-      email: "george@gmail.com",
-      password: "12345678",
-      role: "parent",
-      gender: null,
-      studentId: null,
-    },
-    {
-      id: 1779198015961,
-      username: "Venus",
-      email: "venus@gmail.com",
-      password: "12345678",
-      role: "student",
-      gender: "girl",
-      studentId: "STU76533",
-    },
-    {
-      id: 1779198052272,
-      username: "Zaw",
-      email: "zaw@gmail.com",
-      password: "12345678",
-      role: "student",
-      gender: "boy",
-      studentId: "STU57465",
-    },
-  ];
+async function loadDemoDataFromJson() {
+  try {
+    const response = await fetch(getDemoDataPath());
+    const data = await response.json();
 
+    seedUsers(data.users || []);
+    seedTeacherStudentLinks(
+      data.teacher_students_links || data.teacherStudentLinks || [],
+    );
+    document.dispatchEvent(new Event("demoDataReady"));
+  } catch (error) {
+    console.log("Demo JSON data could not be loaded", error);
+  }
+}
+
+function seedUsers(defaultUsers) {
   const users = JSON.parse(localStorage.getItem("users")) || [];
 
   defaultUsers.forEach(function (defaultUser) {
@@ -113,35 +44,7 @@ function seedUsers() {
   localStorage.setItem("users", JSON.stringify(users));
 }
 
-function seedTeacherStudentLinks() {
-  const defaultLinks = [
-    {
-      id: 1,
-      teacherId: 1779197776744,
-      studentId: "STU84817",
-    },
-    {
-      id: 2,
-      teacherId: 1779197776744,
-      studentId: "STU76533",
-    },
-    {
-      id: 3,
-      teacherId: 1779197851253,
-      studentId: "STU57465",
-    },
-    {
-      id: 4,
-      teacherId: 1779197851253,
-      studentId: "STU16217",
-    },
-    {
-      id: 5,
-      teacherId: 1779197938328,
-      studentId: "STU84817",
-    },
-  ];
-
+function seedTeacherStudentLinks(defaultLinks) {
   const links = JSON.parse(localStorage.getItem("teacherStudentLinks")) || [];
 
   defaultLinks.forEach(function (defaultLink) {
@@ -158,6 +61,21 @@ function seedTeacherStudentLinks() {
   });
 
   localStorage.setItem("teacherStudentLinks", JSON.stringify(links));
+}
+
+function getDemoDataPath() {
+  const path = window.location.pathname;
+
+  if (
+    path.includes("/teacher-page/") ||
+    path.includes("/student-page/") ||
+    path.includes("/parent-page/") ||
+    path.includes("/signup-page/")
+  ) {
+    return "../assets/data/users.json";
+  }
+
+  return "assets/data/users.json";
 }
 
 function setupThemeControls() {
@@ -249,4 +167,30 @@ function getHomePath() {
   }
 
   return "index.html";
+}
+
+function setupBackToTopButton() {
+  const backToTopBtn = document.createElement("button");
+
+  backToTopBtn.type = "button";
+  backToTopBtn.className = "btn btn-success back-to-top-btn";
+  backToTopBtn.innerHTML = `<i class="bi bi-arrow-up"></i>`;
+  backToTopBtn.setAttribute("aria-label", "Back to top");
+
+  document.body.appendChild(backToTopBtn);
+
+  window.addEventListener("scroll", function () {
+    if (window.scrollY > 250) {
+      backToTopBtn.classList.add("show");
+    } else {
+      backToTopBtn.classList.remove("show");
+    }
+  });
+
+  backToTopBtn.addEventListener("click", function () {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  });
 }

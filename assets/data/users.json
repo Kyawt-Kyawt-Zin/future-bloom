@@ -1,0 +1,116 @@
+{
+  "users": [
+    {
+      "id": 1779197744303,
+      "username": "Kyawt",
+      "email": "kyawt@gmail.com",
+      "password": "12345678",
+      "role": "parent",
+      "gender": null,
+      "studentId": null
+    },
+    {
+      "id": 1779197776744,
+      "username": "Rozy",
+      "email": "rozy@gmail.com",
+      "password": "12345678",
+      "role": "teacher",
+      "gender": null,
+      "studentId": null
+    },
+    {
+      "id": 1779197810119,
+      "username": "Sofia",
+      "email": "sofia@gmail.com",
+      "password": "12345678",
+      "role": "student",
+      "gender": "girl",
+      "studentId": "STU84817",
+      "grade": "Grade 7"
+    },
+    {
+      "id": 1779197851253,
+      "username": "Qasim",
+      "email": "qasim@gmail.com",
+      "password": "12345678",
+      "role": "teacher",
+      "gender": null,
+      "studentId": null
+    },
+    {
+      "id": 1779197886054,
+      "username": "Hein",
+      "email": "hein@gmail.com",
+      "password": "12345678",
+      "role": "student",
+      "gender": "boy",
+      "studentId": "STU16217",
+      "grade": "Grade 8"
+    },
+    {
+      "id": 1779197938328,
+      "username": "Maria",
+      "email": "maria@gmail.com",
+      "password": "12345678",
+      "role": "teacher",
+      "gender": null,
+      "studentId": null
+    },
+    {
+      "id": 1779197972091,
+      "username": "George",
+      "email": "george@gmail.com",
+      "password": "12345678",
+      "role": "parent",
+      "gender": null,
+      "studentId": null
+    },
+    {
+      "id": 1779198015961,
+      "username": "Venus",
+      "email": "venus@gmail.com",
+      "password": "12345678",
+      "role": "student",
+      "gender": "girl",
+      "studentId": "STU76533",
+      "grade": "Grade 6"
+    },
+    {
+      "id": 1779198052272,
+      "username": "Zaw",
+      "email": "zaw@gmail.com",
+      "password": "12345678",
+      "role": "student",
+      "gender": "boy",
+      "studentId": "STU57465",
+      "grade": "Grade 7"
+    }
+  ],
+  "teacher_students_links": [
+    {
+      "id": 1,
+      "teacherId": 1779197776744,
+      "studentId": "STU84817"
+    },
+    {
+      "id": 2,
+      "teacherId": 1779197776744,
+      "studentId": "STU76533"
+    },
+    {
+      "id": 3,
+      "teacherId": 1779197851253,
+      "studentId": "STU57465"
+    },
+    {
+      "id": 4,
+      "teacherId": 1779197851253,
+      "studentId": "STU16217"
+    },
+    {
+      "id": 5,
+      "teacherId": 1779197938328,
+      "studentId": "STU84817"
+    }
+  ]
+}

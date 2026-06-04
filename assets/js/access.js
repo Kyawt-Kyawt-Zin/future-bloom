@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const scheduleForm = document.getElementById("scheduleForm");
   const assignmentForm = document.getElementById("assignmentForm");
   const reportForm = document.getElementById("reportForm");
+  const accessAlert = document.getElementById("accessAlert");
   const scheduleMessage = document.getElementById("scheduleMessage");
   const assignmentMessage = document.getElementById("assignmentMessage");
   const reportMessage = document.getElementById("reportMessage");
@@ -21,6 +22,18 @@ document.addEventListener("DOMContentLoaded", function () {
   const reportGrade = document.getElementById("reportGrade");
   const backToTeacherBtn = document.getElementById("backToTeacherBtn");
   const logoutBtn = document.getElementById("logoutBtn");
+  const scheduleSubject = document.getElementById("scheduleSubject");
+  const assignmentSubject = document.getElementById("assignmentSubject");
+  const scheduleDay = document.getElementById("scheduleDay");
+  const scheduleStartTime = document.getElementById("scheduleStartTime");
+  const scheduleEndTime = document.getElementById("scheduleEndTime");
+  const scheduleSaveBtn = scheduleForm.querySelector('button[type="submit"]');
+  const newSubjectName = document.getElementById("newSubjectName");
+  const confirmAddSubjectBtn = document.getElementById("confirmAddSubjectBtn");
+  let editingScheduleId = null;
+  const addSubjectModal = new bootstrap.Modal(
+    document.getElementById("addSubjectModal"),
+  );
 
   if (!currentUser && lastTeacherUser) {
     currentUser = lastTeacherUser;
@@ -39,6 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
   localStorage.setItem("lastTeacherUser", JSON.stringify(currentUser));
 
   setupAccessFormButtons();
+  renderSubjectOptions();
 
   backToTeacherBtn.addEventListener("click", function () {
     localStorage.setItem("currentUser", JSON.stringify(currentUser));
@@ -58,7 +72,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   studentInfo.innerHTML = `
     <h3 class="fw-bold mb-2">Accessing ${student.username}</h3>
-    <p class="mb-0"><strong>Student ID:</strong> ${student.studentId}</p>
+    <p class="mb-1"><strong>Student ID:</strong> ${student.studentId}</p>
+    <p class="mb-0"><strong>Grade:</strong> ${
+      student.grade || "Not selected"
+    }</p>
   `;
 
   renderRecords();
@@ -66,6 +83,94 @@ document.addEventListener("DOMContentLoaded", function () {
   reportMarks.addEventListener("input", function () {
     reportGrade.value = calculateGrade(reportMarks.value);
   });
+
+  confirmAddSubjectBtn.addEventListener("click", function () {
+    addCustomSubject();
+  });
+
+  function getSubjects() {
+    const syllabusSubjects = [
+      "English",
+      "Mathematics",
+      "Science",
+      "History",
+      "Geography",
+      "Economics",
+    ];
+    const customSubjects =
+      JSON.parse(localStorage.getItem("customSubjects")) || [];
+
+    return [...syllabusSubjects, ...customSubjects];
+  }
+
+  function renderSubjectOptions() {
+    const subjects = getSubjects();
+    const options = subjects
+      .map(function (subject) {
+        return `<option value="${subject}">${subject}</option>`;
+      })
+      .join("");
+
+    scheduleSubject.innerHTML = `
+      <option value="">Choose subject</option>
+      ${options}
+    `;
+
+    assignmentSubject.innerHTML = `
+      <option value="">Choose subject</option>
+      ${options}
+    `;
+  }
+
+  function addCustomSubject() {
+    const subject = newSubjectName.value.trim();
+
+    if (subject === "") {
+      showAccessAlert("Please enter a subject name.", "warning");
+      return;
+    }
+
+    const normalizedSubject = normalizeText(subject);
+    const subjectAlreadyExists = getSubjects().some(function (existingSubject) {
+      return normalizeText(existingSubject) === normalizedSubject;
+    });
+
+    if (subjectAlreadyExists) {
+      showAccessAlert("This subject already exists.", "warning");
+      return;
+    }
+
+    const customSubjects =
+      JSON.parse(localStorage.getItem("customSubjects")) || [];
+
+    customSubjects.push(subject);
+    localStorage.setItem("customSubjects", JSON.stringify(customSubjects));
+
+    renderSubjectOptions();
+    scheduleSubject.value = subject;
+    assignmentSubject.value = subject;
+    newSubjectName.value = "";
+    addSubjectModal.hide();
+    showAccessAlert("Subject added successfully.", "success");
+  }
+
+  function showAccessAlert(message, type) {
+    accessAlert.innerHTML = `
+      <div class="alert alert-${type} alert-dismissible fade show rounded-4 shadow-sm" role="alert">
+        ${message}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+    `;
+  }
+
+  function normalizeText(value) {
+    return String(value).toLowerCase().replace(/\s+/g, "");
+  }
 
   function setupAccessFormButtons() {
     const formButtons = document.querySelectorAll(".access-form-btn");
@@ -107,10 +212,10 @@ document.addEventListener("DOMContentLoaded", function () {
   scheduleForm.addEventListener("submit", function (event) {
     event.preventDefault();
 
-    const subject = document.getElementById("scheduleSubject").value.trim();
-    const day = document.getElementById("scheduleDay").value;
-    const startTime = document.getElementById("scheduleStartTime").value;
-    const endTime = document.getElementById("scheduleEndTime").value;
+    const subject = scheduleSubject.value;
+    const day = scheduleDay.value;
+    const startTime = scheduleStartTime.value;
+    const endTime = scheduleEndTime.value;
 
     if (subject === "" || day === "" || startTime === "" || endTime === "") {
       scheduleMessage.innerHTML = `
@@ -121,26 +226,57 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
+    if (startTime >= endTime) {
+      scheduleMessage.innerHTML = `
+        <div class="alert alert-danger rounded-3">
+          End time must be later than start time.
+        </div>
+      `;
+      return;
+    }
+
     const schedules = JSON.parse(localStorage.getItem("schedules")) || [];
 
-    schedules.push({
-      id: Date.now(),
-      studentId: student.studentId,
-      subject,
-      day,
-      startTime,
-      endTime,
-    });
+    if (editingScheduleId) {
+      const updatedSchedules = schedules.map(function (schedule) {
+        if (schedule.id === editingScheduleId) {
+          return {
+            ...schedule,
+            subject,
+            day,
+            startTime,
+            endTime,
+          };
+        }
 
-    localStorage.setItem("schedules", JSON.stringify(schedules));
+        return schedule;
+      });
 
-    scheduleMessage.innerHTML = `
-      <div class="alert alert-success rounded-3">
-        Schedule saved successfully.
-      </div>
-    `;
+      localStorage.setItem("schedules", JSON.stringify(updatedSchedules));
+      scheduleMessage.innerHTML = `
+        <div class="alert alert-success rounded-3">
+          Schedule updated successfully.
+        </div>
+      `;
+    } else {
+      schedules.push({
+        id: Date.now(),
+        studentId: student.studentId,
+        subject,
+        day,
+        startTime,
+        endTime,
+      });
 
-    scheduleForm.reset();
+      localStorage.setItem("schedules", JSON.stringify(schedules));
+      scheduleMessage.innerHTML = `
+        <div class="alert alert-success rounded-3">
+          Schedule saved successfully.
+        </div>
+      `;
+    }
+
+    resetScheduleForm();
     renderRecords();
   });
 
@@ -148,7 +284,7 @@ document.addEventListener("DOMContentLoaded", function () {
     event.preventDefault();
 
     const title = document.getElementById("assignmentTitle").value.trim();
-    const subject = document.getElementById("assignmentSubject").value.trim();
+    const subject = assignmentSubject.value;
     const deadline = document.getElementById("assignmentDeadline").value;
     const status = document.getElementById("assignmentStatus").value;
 
@@ -276,6 +412,42 @@ document.addEventListener("DOMContentLoaded", function () {
     renderRecords();
   });
 
+  scheduleList.addEventListener("click", function (event) {
+    if (!event.target.classList.contains("edit-schedule-btn")) return;
+
+    const scheduleId = Number(event.target.dataset.scheduleId);
+    const schedules = JSON.parse(localStorage.getItem("schedules")) || [];
+    const schedule = schedules.find(function (item) {
+      return item.id === scheduleId;
+    });
+
+    if (!schedule) return;
+
+    editingScheduleId = schedule.id;
+    scheduleSubject.value = schedule.subject;
+    scheduleDay.value = schedule.day;
+    scheduleStartTime.value = schedule.startTime;
+    scheduleEndTime.value = schedule.endTime;
+    scheduleSaveBtn.textContent = "Update Schedule";
+
+    const scheduleCollapse = bootstrap.Collapse.getOrCreateInstance(
+      document.getElementById("scheduleCollapse"),
+    );
+    scheduleCollapse.show();
+
+    scheduleMessage.innerHTML = `
+      <div class="alert alert-info rounded-3">
+        You are editing this schedule. Change the details and click Update Schedule.
+      </div>
+    `;
+  });
+
+  function resetScheduleForm() {
+    scheduleForm.reset();
+    editingScheduleId = null;
+    scheduleSaveBtn.textContent = "Save Schedule";
+  }
+
   function renderRecords() {
     const schedules = JSON.parse(localStorage.getItem("schedules")) || [];
     const assignments = JSON.parse(localStorage.getItem("assignments")) || [];
@@ -312,6 +484,14 @@ document.addEventListener("DOMContentLoaded", function () {
           <td>${schedule.day}</td>
           <td>${schedule.startTime}</td>
           <td>${schedule.endTime}</td>
+          <td>
+            <button
+              class="btn btn-sm btn-outline-success edit-schedule-btn"
+              data-schedule-id="${schedule.id}"
+            >
+              Edit
+            </button>
+          </td>
         </tr>
       `;
     });
@@ -325,6 +505,7 @@ document.addEventListener("DOMContentLoaded", function () {
               <th>Day</th>
               <th>Start Time</th>
               <th>End Time</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>${rows}</tbody>

@@ -87,12 +87,15 @@
           </div>
 
           <div class="d-flex flex-column flex-lg-row gap-2">
-            <a
-              href="../student-page/child-profile.html"
+            <button
+              id="openAddStudentBtn"
               class="btn btn-warning rounded-3 px-3"
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#addStudentModal"
             >
               Add Students
-            </a>
+            </button>
 
             <button id="logoutBtn" class="btn btn-success rounded-3 px-3">
               Log Out
@@ -109,10 +112,21 @@
         class="alert alert-success rounded-4 d-none shadow p-4 mt-4"
       ></div>
 
+      <div id="teacherAlert"></div>
+
       <!-- create a table of students  -->
       <section class="card shadow rounded-4 p-4 mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
+        <div
+          class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3"
+        >
           <h3 class="mb-0">My Students</h3>
+
+          <input
+            type="text"
+            id="studentSearchInput"
+            class="form-control"
+            placeholder="Search by student name or ID"
+          />
         </div>
 
         <div class="table-responsive">
@@ -121,21 +135,12 @@
               <tr>
                 <th>Student Name</th>
                 <th>Student ID</th>
+                <th>Grade</th>
                 <th>Actions</th>
               </tr>
             </thead>
 
             <tbody id="studentTableBody"></tbody>
-
-            <tfoot>
-              <tr>
-                <td colspan="3">
-                  <button id="addStudentBtn" class="btn btn-success w-100">
-                    Add Student
-                  </button>
-                </td>
-              </tr>
-            </tfoot>
           </table>
         </div>
 
@@ -145,6 +150,198 @@
         ></div>
       </section>
     </main>
+
+    <div
+      class="modal fade"
+      id="addStudentModal"
+      tabindex="-1"
+      aria-labelledby="addStudentModalTitle"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addStudentModalTitle">Add Student</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <div class="modal-body">
+            <ul class="nav nav-tabs mb-3" id="addStudentTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link active"
+                  id="existingStudentTab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#existingStudentPane"
+                  type="button"
+                  role="tab"
+                >
+                  Existing Student
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  id="newStudentTab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#newStudentPane"
+                  type="button"
+                  role="tab"
+                >
+                  New Student
+                </button>
+              </li>
+            </ul>
+
+            <div class="tab-content">
+              <div
+                class="tab-pane fade show active"
+                id="existingStudentPane"
+                role="tabpanel"
+              >
+                <label for="availableStudentSelect" class="form-label">
+                  Existing students not connected to you
+                </label>
+                <select id="availableStudentSelect" class="form-select"></select>
+              </div>
+
+              <div class="tab-pane fade" id="newStudentPane" role="tabpanel">
+                <div class="mb-3">
+                  <label for="newStudentName" class="form-label">
+                    Student Name
+                  </label>
+                  <input
+                    type="text"
+                    id="newStudentName"
+                    class="form-control"
+                    placeholder="Example: Aye Aye"
+                  />
+                </div>
+
+                <div class="mb-3">
+                  <label for="newStudentEmail" class="form-label">
+                    Student Email
+                  </label>
+                  <input
+                    type="email"
+                    id="newStudentEmail"
+                    class="form-control"
+                    placeholder="Example: student@example.com"
+                  />
+                </div>
+
+                <div class="mb-3">
+                  <label for="newStudentGender" class="form-label">
+                    Gender
+                  </label>
+                  <select id="newStudentGender" class="form-select">
+                    <option value="">Choose gender</option>
+                    <option value="boy">Boy</option>
+                    <option value="girl">Girl</option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label for="newStudentGrade" class="form-label">
+                    Grade
+                  </label>
+                  <select id="newStudentGrade" class="form-select">
+                    <option value="">Choose grade</option>
+                    <option value="Grade 1">Grade 1</option>
+                    <option value="Grade 2">Grade 2</option>
+                    <option value="Grade 3">Grade 3</option>
+                    <option value="Grade 4">Grade 4</option>
+                    <option value="Grade 5">Grade 5</option>
+                    <option value="Grade 6">Grade 6</option>
+                    <option value="Grade 7">Grade 7</option>
+                    <option value="Grade 8">Grade 8</option>
+                    <option value="Grade 9">Grade 9</option>
+                    <option value="Grade 10">Grade 10</option>
+                    <option value="Grade 11">Grade 11</option>
+                    <option value="Grade 12">Grade 12</option>
+                  </select>
+                </div>
+
+                <div class="alert alert-info rounded-3 mb-0">
+                  Default password for new students is
+                  <strong>12345678</strong>.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button
+              id="confirmAddExistingStudentBtn"
+              type="button"
+              class="btn btn-success"
+            >
+              Add Existing Student
+            </button>
+            <button
+              id="confirmCreateStudentBtn"
+              type="button"
+              class="btn btn-success d-none"
+            >
+              Create Student
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="deleteStudentModal"
+      tabindex="-1"
+      aria-labelledby="deleteStudentModalTitle"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteStudentModalTitle">
+              Confirm Remove Student
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <div class="modal-body">
+            <p id="deleteStudentMessage" class="mb-0"></p>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button id="confirmDeleteStudentBtn" type="button" class="btn btn-danger">
+              Remove Student
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- footer section -->
     <footer class="text-center border-top p-3 mt-5">

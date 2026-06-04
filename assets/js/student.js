@@ -3,6 +3,7 @@ console.log("student.js connected");
 document.addEventListener("DOMContentLoaded", function () {
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   const welcomeMessage = document.getElementById("welcomeMessage");
+  const studentAlert = document.getElementById("studentAlert");
   const studentScheduleList = document.getElementById("studentScheduleList");
   const studentAssignmentList = document.getElementById("studentAssignmentList");
   const studentReportList = document.getElementById("studentReportList");
@@ -11,6 +12,9 @@ document.addEventListener("DOMContentLoaded", function () {
   );
   const submitAssignmentMessage = document.getElementById(
     "submitAssignmentMessage",
+  );
+  const pendingAssignmentSelect = document.getElementById(
+    "pendingAssignmentSelect",
   );
 
   if (!currentUser || !welcomeMessage) return;
@@ -23,6 +27,11 @@ document.addEventListener("DOMContentLoaded", function () {
     <p class="mt-3">
       Please note that your Student ID is:
       <strong>${currentUser.studentId}</strong>
+    </p>
+
+    <p>
+      Your current grade is:
+      <strong>${currentUser.grade || "Not selected"}</strong>
     </p>
 
     <p>
@@ -39,9 +48,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (submitAssignmentDemoBtn) {
     submitAssignmentDemoBtn.addEventListener("click", function () {
+      const selectedAssignmentTitle =
+        pendingAssignmentSelect.options[pendingAssignmentSelect.selectedIndex]
+          ?.text || "";
+
+      if (!pendingAssignmentSelect.value) {
+        submitAssignmentMessage.innerHTML = `
+          <div class="alert alert-warning rounded-3 mb-0">
+            Please choose a pending assignment first.
+          </div>
+        `;
+        return;
+      }
+
       submitAssignmentMessage.innerHTML = `
         <div class="alert alert-info rounded-3 mb-0">
-          Demo feature: assignment file upload will be available in a future version.
+          Demo feature: your selected file is marked for
+          <strong>${selectedAssignmentTitle}</strong>.
+          Real file upload will be available in a future version.
         </div>
       `;
     });
@@ -69,6 +93,37 @@ document.addEventListener("DOMContentLoaded", function () {
     studentScheduleList.innerHTML = renderScheduleTable(mySchedules);
     studentAssignmentList.innerHTML = renderAssignmentTable(myAssignments);
     studentReportList.innerHTML = renderReportCardTable(myReportCards);
+    renderPendingAssignmentOptions(myAssignments);
+  }
+
+  function renderPendingAssignmentOptions(assignments) {
+    const pendingAssignments = assignments.filter(function (assignment) {
+      return assignment.status === "pending";
+    });
+
+    pendingAssignmentSelect.innerHTML = "";
+
+    if (pendingAssignments.length === 0) {
+      pendingAssignmentSelect.innerHTML = `
+        <option value="">No pending assignments</option>
+      `;
+      submitAssignmentDemoBtn.disabled = true;
+      return;
+    }
+
+    submitAssignmentDemoBtn.disabled = false;
+
+    pendingAssignmentSelect.innerHTML = `
+      <option value="">Choose assignment</option>
+    `;
+
+    pendingAssignments.forEach(function (assignment) {
+      pendingAssignmentSelect.innerHTML += `
+        <option value="${assignment.id}">
+          ${assignment.title} - ${assignment.subject} - Due ${assignment.deadline}
+        </option>
+      `;
+    });
   }
 
   function showDeadlineAlerts(assignments) {
@@ -78,9 +133,29 @@ document.addEventListener("DOMContentLoaded", function () {
       return assignment.status === "pending" && assignment.deadline < today;
     });
 
-    if (overdueAssignments.length > 0) {
-      alert("You have pending assignment(s) past the deadline.");
+    if (!studentAlert) return;
+
+    if (overdueAssignments.length === 0) {
+      studentAlert.innerHTML = "";
+      return;
     }
+
+    const assignmentText =
+      overdueAssignments.length === 1 ? "assignment is" : "assignments are";
+
+    studentAlert.innerHTML = `
+      <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm mt-4" role="alert">
+        <strong>Deadline reminder:</strong>
+        ${overdueAssignments.length} pending ${assignmentText} past the deadline.
+        Please check your assignment list below.
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+    `;
   }
 
   function renderScheduleTable(schedules) {

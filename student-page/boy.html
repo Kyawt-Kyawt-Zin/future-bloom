@@ -88,6 +88,8 @@
         class="alert alert-success rounded-4 shadow p-4 mt-4"
       ></div>
 
+      <div id="studentAlert"></div>
+
       <section class="card shadow rounded-4 p-4 mt-4">
         <h3 class="mb-3">My Schedules</h3>
         <div id="studentScheduleList"></div>
@@ -100,6 +102,13 @@
 
       <section class="card shadow rounded-4 p-4 mt-4">
         <h3 class="mb-3">Submit Assignment</h3>
+
+        <div class="mb-3">
+          <label for="pendingAssignmentSelect" class="form-label">
+            Choose Pending Assignment
+          </label>
+          <select id="pendingAssignmentSelect" class="form-select"></select>
+        </div>
 
         <div class="mb-3">
           <label for="assignmentFile" class="form-label">
