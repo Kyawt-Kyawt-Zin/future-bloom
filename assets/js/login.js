@@ -1,5 +1,25 @@
 console.log("login js connected");
 
+const toggleLoginPasswordBtn = document.getElementById("toggleLoginPassword");
+
+if (toggleLoginPasswordBtn) {
+  toggleLoginPasswordBtn.addEventListener("click", function () {
+    const loginPassword = document.getElementById("loginPassword");
+    const loginPasswordIcon = document.getElementById("loginPasswordIcon");
+
+    if (loginPassword.type === "password") {
+      loginPassword.type = "text";
+      loginPasswordIcon.classList.remove("bi-eye-slash");
+      loginPasswordIcon.classList.add("bi-eye");
+      return;
+    }
+
+    loginPassword.type = "password";
+    loginPasswordIcon.classList.remove("bi-eye");
+    loginPasswordIcon.classList.add("bi-eye-slash");
+  });
+}
+
 function login(event) {
   event.preventDefault();
 

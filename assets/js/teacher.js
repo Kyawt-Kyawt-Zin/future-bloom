@@ -142,15 +142,19 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   studentTableBody.addEventListener("click", function (event) {
-    if (event.target.classList.contains("delete-student-btn")) {
-      studentIdToDelete = event.target.dataset.studentId;
+    const deleteStudentBtn = event.target.closest(".delete-student-btn");
+    const accessBtn = event.target.closest(".access-btn");
+
+    if (deleteStudentBtn) {
+      studentIdToDelete = deleteStudentBtn.dataset.studentId;
       openDeleteModal(studentIdToDelete);
     }
 
-    if (event.target.classList.contains("access-btn")) {
-      const studentId = event.target.dataset.studentId;
+    if (accessBtn) {
+      const studentId = accessBtn.dataset.studentId;
       localStorage.setItem("lastTeacherUser", JSON.stringify(currentUser));
-      window.location.href = `access.html?studentId=${studentId}`;
+      localStorage.setItem("selectedStudentId", studentId);
+      window.location.assign(`access.html?studentId=${encodeURIComponent(studentId)}`);
     }
   });
 

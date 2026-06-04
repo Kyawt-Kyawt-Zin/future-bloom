@@ -5,7 +5,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const lastTeacherUser = JSON.parse(localStorage.getItem("lastTeacherUser"));
   const users = JSON.parse(localStorage.getItem("users")) || [];
   const params = new URLSearchParams(window.location.search);
-  const studentId = params.get("studentId");
+  const studentId =
+    params.get("studentId") || localStorage.getItem("selectedStudentId");
 
   const studentInfo = document.getElementById("studentInfo");
   const scheduleForm = document.getElementById("scheduleForm");

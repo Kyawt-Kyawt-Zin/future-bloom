@@ -94,12 +94,22 @@
 
             <!-- password -->
             <div class="mb-3">
-              <input
-                type="password"
-                id="loginPassword"
-                class="form-control rounded-3"
-                placeholder="Enter password"
-              />
+              <div class="input-group">
+                <input
+                  type="password"
+                  id="loginPassword"
+                  class="form-control rounded-start-3"
+                  placeholder="Enter password"
+                />
+                <button
+                  class="btn btn-success rounded-end-3"
+                  type="button"
+                  id="toggleLoginPassword"
+                  aria-label="Show or hide password"
+                >
+                  <i class="bi bi-eye-slash" id="loginPasswordIcon"></i>
+                </button>
+              </div>
             </div>
 
             <!-- button -->
