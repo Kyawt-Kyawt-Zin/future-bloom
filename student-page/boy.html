@@ -70,6 +70,41 @@
         </div>
 
         <div class="d-flex flex-column flex-sm-row gap-2 ms-3">
+          <div class="dropdown">
+            <button
+              class="btn btn-outline-success rounded-3"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              aria-label="Student settings"
+            >
+              <i class="bi bi-gear-fill"></i>
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <button
+                  class="dropdown-item"
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#studentProfileModal"
+                >
+                  Profile
+                </button>
+              </li>
+              <li>
+                <button
+                  class="dropdown-item"
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#changePasswordModal"
+                >
+                  Change Password
+                </button>
+              </li>
+            </ul>
+          </div>
+
           <a href="../index.html" class="btn btn-warning rounded-3 px-3">
             Home
           </a>
@@ -133,6 +168,138 @@
         <div id="studentReportList"></div>
       </section>
     </main>
+
+    <div
+      class="modal fade"
+      id="studentProfileModal"
+      tabindex="-1"
+      aria-labelledby="studentProfileModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content rounded-4">
+          <div class="modal-header">
+            <h5 class="modal-title" id="studentProfileModalLabel">
+              Student Profile
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <div class="modal-body" id="studentProfileDetails"></div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="changePasswordModal"
+      tabindex="-1"
+      aria-labelledby="changePasswordModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content rounded-4">
+          <div class="modal-header">
+            <h5 class="modal-title" id="changePasswordModalLabel">
+              Change Password
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <form id="changePasswordForm">
+            <div class="modal-body">
+              <div id="changePasswordMessage"></div>
+
+              <div class="mb-3">
+                <label for="currentPassword" class="form-label">
+                  Current Password
+                </label>
+                <div class="input-group">
+                  <input
+                    type="password"
+                    id="currentPassword"
+                    class="form-control"
+                  />
+                  <button
+                    class="btn btn-outline-success password-toggle-btn"
+                    type="button"
+                    data-password-target="currentPassword"
+                    data-icon-target="currentPasswordIcon"
+                  >
+                    <i class="bi bi-eye-slash" id="currentPasswordIcon"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="newPassword" class="form-label">
+                  New Password
+                </label>
+                <div class="input-group">
+                  <input
+                    type="password"
+                    id="newPassword"
+                    class="form-control"
+                  />
+                  <button
+                    class="btn btn-outline-success password-toggle-btn"
+                    type="button"
+                    data-password-target="newPassword"
+                    data-icon-target="newPasswordIcon"
+                  >
+                    <i class="bi bi-eye-slash" id="newPasswordIcon"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="confirmNewPassword" class="form-label">
+                  Confirm Password
+                </label>
+                <div class="input-group">
+                  <input
+                    type="password"
+                    id="confirmNewPassword"
+                    class="form-control"
+                  />
+                  <button
+                    class="btn btn-outline-success password-toggle-btn"
+                    type="button"
+                    data-password-target="confirmNewPassword"
+                    data-icon-target="confirmNewPasswordIcon"
+                  >
+                    <i class="bi bi-eye-slash" id="confirmNewPasswordIcon"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-success">
+                Save Password
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
     
     <!-- footer section -->
     <footer class="text-center border-top p-3 mt-5">

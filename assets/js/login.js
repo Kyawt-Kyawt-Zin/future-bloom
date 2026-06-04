@@ -3,6 +3,8 @@ console.log("login js connected");
 function login(event) {
   event.preventDefault();
 
+  const loginMessage = document.getElementById("loginMessage");
+
   // get input values
   const loginInput = document.getElementById("loginInput").value.trim();
 
@@ -21,29 +23,44 @@ function login(event) {
 
   // validation
   if (!matchedUser) {
-    alert("Invalid username/email or password");
+    loginMessage.innerHTML = `
+      <div class="alert alert-danger rounded-3">
+        Invalid username/email or password.
+      </div>
+    `;
     return;
   }
 
   // save current logged in user
   localStorage.setItem("currentUser", JSON.stringify(matchedUser));
 
-  alert("Login successful");
+  loginMessage.innerHTML = `
+    <div class="alert alert-success rounded-3">
+      Login successful. Redirecting...
+    </div>
+  `;
 
-  // role redirect
-  if (matchedUser.role === "parent") {
-    window.location.href = "../parent-page/index.html";
-  } else if (matchedUser.role === "teacher") {
-    window.location.href = "../teacher-page/index.html";
-  } else if (matchedUser.role === "student") {
-    // boy student
-    if (matchedUser.gender === "boy") {
-      window.location.href = "../student-page/boy.html";
-    }
+  setTimeout(function () {
+    window.location.href = getRedirectPath(matchedUser);
+  }, 2000);
+}
 
-    // girl student
-    else {
-      window.location.href = "../student-page/girl.html";
-    }
+function getRedirectPath(user) {
+  if (user.role === "parent") {
+    return "parent-page/index.html";
   }
+
+  if (user.role === "teacher") {
+    return "teacher-page/index.html";
+  }
+
+  if (user.role === "student" && user.gender === "boy") {
+    return "student-page/boy.html";
+  }
+
+  if (user.role === "student") {
+    return "student-page/girl.html";
+  }
+
+  return "index.html";
 }

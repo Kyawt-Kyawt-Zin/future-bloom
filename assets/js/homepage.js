@@ -32,16 +32,40 @@ function seedUsers(defaultUsers) {
   const users = JSON.parse(localStorage.getItem("users")) || [];
 
   defaultUsers.forEach(function (defaultUser) {
-    const userAlreadyExists = users.some(function (user) {
+    const existingUserIndex = users.findIndex(function (user) {
       return user.email === defaultUser.email;
     });
 
-    if (!userAlreadyExists) {
+    if (existingUserIndex === -1) {
       users.push(defaultUser);
+      return;
     }
+
+    users[existingUserIndex] = fillMissingUserData(
+      users[existingUserIndex],
+      defaultUser,
+    );
   });
 
   localStorage.setItem("users", JSON.stringify(users));
+}
+
+function fillMissingUserData(existingUser, defaultUser) {
+  const updatedUser = { ...existingUser };
+
+  Object.keys(defaultUser).forEach(function (key) {
+    const currentValue = updatedUser[key];
+
+    if (
+      currentValue === undefined ||
+      currentValue === null ||
+      currentValue === ""
+    ) {
+      updatedUser[key] = defaultUser[key];
+    }
+  });
+
+  return updatedUser;
 }
 
 function seedTeacherStudentLinks(defaultLinks) {

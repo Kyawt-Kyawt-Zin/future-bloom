@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const teacherAlert = document.getElementById("teacherAlert");
   const studentSearchInput = document.getElementById("studentSearchInput");
   const studentTableBody = document.getElementById("studentTableBody");
+  const studentCount = document.getElementById("studentCount");
   const studentPagination = document.getElementById("studentPagination");
   const availableStudentSelect = document.getElementById("availableStudentSelect");
   const confirmAddExistingStudentBtn = document.getElementById(
@@ -25,12 +26,21 @@ document.addEventListener("DOMContentLoaded", function () {
   const newStudentTab = document.getElementById("newStudentTab");
   const newStudentName = document.getElementById("newStudentName");
   const newStudentEmail = document.getElementById("newStudentEmail");
+  const newStudentParentEmail = document.getElementById(
+    "newStudentParentEmail",
+  );
   const newStudentGender = document.getElementById("newStudentGender");
   const newStudentGrade = document.getElementById("newStudentGrade");
   const confirmDeleteStudentBtn = document.getElementById(
     "confirmDeleteStudentBtn",
   );
   const deleteStudentMessage = document.getElementById("deleteStudentMessage");
+  const teacherChangePasswordForm = document.getElementById(
+    "teacherChangePasswordForm",
+  );
+  const teacherPasswordMessage = document.getElementById(
+    "teacherPasswordMessage",
+  );
   const logoutBtn = document.getElementById("logoutBtn");
 
   const addStudentModal = new bootstrap.Modal(
@@ -56,6 +66,10 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
+  currentUser = getFreshCurrentTeacher();
+  localStorage.setItem("currentUser", JSON.stringify(currentUser));
+  localStorage.setItem("lastTeacherUser", JSON.stringify(currentUser));
+
   if (welcomeMessage) {
     welcomeMessage.classList.remove("d-none");
     welcomeMessage.innerHTML = `
@@ -67,6 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   renderStudents();
   renderAvailableStudentOptions();
+  setupTeacherPasswordToggles();
 
   document.addEventListener("demoDataReady", function () {
     renderStudents();
@@ -119,6 +134,13 @@ document.addEventListener("DOMContentLoaded", function () {
     deleteStudentModal.hide();
   });
 
+  if (teacherChangePasswordForm) {
+    teacherChangePasswordForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      changeTeacherPassword();
+    });
+  }
+
   studentTableBody.addEventListener("click", function (event) {
     if (event.target.classList.contains("delete-student-btn")) {
       studentIdToDelete = event.target.dataset.studentId;
@@ -138,6 +160,132 @@ document.addEventListener("DOMContentLoaded", function () {
     currentPage = Number(event.target.dataset.page);
     renderStudents();
   });
+
+  function getFreshCurrentTeacher() {
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const freshTeacher = users.find(function (user) {
+      return (
+        user.id === currentUser.id ||
+        user.email === currentUser.email ||
+        user.username === currentUser.username
+      );
+    });
+
+    return freshTeacher || currentUser;
+  }
+
+  function setupTeacherPasswordToggles() {
+    const toggleButtons = document.querySelectorAll(
+      ".teacher-password-toggle-btn",
+    );
+
+    toggleButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        const inputElement = document.getElementById(
+          button.dataset.passwordTarget,
+        );
+        const iconElement = document.getElementById(button.dataset.iconTarget);
+
+        togglePasswordVisibility(inputElement, iconElement);
+      });
+    });
+  }
+
+  function togglePasswordVisibility(inputElement, iconElement) {
+    if (!inputElement || !iconElement) return;
+
+    if (inputElement.type === "password") {
+      inputElement.type = "text";
+      iconElement.classList.remove("bi-eye-slash");
+      iconElement.classList.add("bi-eye");
+      return;
+    }
+
+    inputElement.type = "password";
+    iconElement.classList.remove("bi-eye");
+    iconElement.classList.add("bi-eye-slash");
+  }
+
+  function changeTeacherPassword() {
+    const currentPassword = document
+      .getElementById("teacherCurrentPassword")
+      .value.trim();
+    const newPassword = document
+      .getElementById("teacherNewPassword")
+      .value.trim();
+    const confirmNewPassword = document
+      .getElementById("teacherConfirmNewPassword")
+      .value.trim();
+    const errorMessages = [];
+
+    teacherPasswordMessage.innerHTML = "";
+
+    if (currentPassword === "") {
+      errorMessages.push("Current password is required.");
+    }
+
+    if (newPassword === "") {
+      errorMessages.push("New password is required.");
+    }
+
+    if (confirmNewPassword === "") {
+      errorMessages.push("Confirm password is required.");
+    }
+
+    if (newPassword && newPassword.length < 6) {
+      errorMessages.push("New password should be at least 6 characters.");
+    }
+
+    if (newPassword.length > 20) {
+      errorMessages.push("New password should be no more than 20 characters.");
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      errorMessages.push("New password and confirm password must match.");
+    }
+
+    if (currentPassword !== currentUser.password) {
+      errorMessages.push("Current password is incorrect.");
+    }
+
+    if (errorMessages.length > 0) {
+      teacherPasswordMessage.innerHTML = `
+        <div class="alert alert-danger rounded-3">
+          ${errorMessages.join("<br />")}
+        </div>
+      `;
+      return;
+    }
+
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const updatedUsers = users.map(function (user) {
+      if (user.id === currentUser.id || user.email === currentUser.email) {
+        return {
+          ...user,
+          password: newPassword,
+        };
+      }
+
+      return user;
+    });
+
+    currentUser = {
+      ...currentUser,
+      password: newPassword,
+    };
+
+    localStorage.setItem("users", JSON.stringify(updatedUsers));
+    localStorage.setItem("currentUser", JSON.stringify(currentUser));
+    localStorage.setItem("lastTeacherUser", JSON.stringify(currentUser));
+
+    teacherPasswordMessage.innerHTML = `
+      <div class="alert alert-success rounded-3">
+        Password changed successfully.
+      </div>
+    `;
+
+    teacherChangePasswordForm.reset();
+  }
 
   function getAllStudents() {
     const users = JSON.parse(localStorage.getItem("users")) || [];
@@ -203,6 +351,7 @@ document.addEventListener("DOMContentLoaded", function () {
           </td>
         </tr>
       `;
+      studentCount.textContent = "Total students: 0";
       studentPagination.innerHTML = "";
       return;
     }
@@ -233,6 +382,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     renderPagination(totalPages);
+    renderStudentCount(filteredStudents.length, startIndex, studentsToShow.length);
+  }
+
+  function renderStudentCount(totalStudents, startIndex, showingCount) {
+    const firstStudentNumber = startIndex + 1;
+    const lastStudentNumber = startIndex + showingCount;
+
+    studentCount.textContent = `Showing ${firstStudentNumber}-${lastStudentNumber} of ${totalStudents} student(s).`;
   }
 
   function renderPagination(totalPages) {
@@ -339,10 +496,17 @@ document.addEventListener("DOMContentLoaded", function () {
   function createStudentAndConnect() {
     const username = newStudentName.value.trim();
     const email = newStudentEmail.value.trim();
+    const parentEmail = newStudentParentEmail.value.trim();
     const gender = newStudentGender.value;
     const grade = newStudentGrade.value;
 
-    if (username === "" || email === "" || gender === "" || grade === "") {
+    if (
+      username === "" ||
+      email === "" ||
+      parentEmail === "" ||
+      gender === "" ||
+      grade === ""
+    ) {
       showBootstrapAlert("Please fill in all new student fields.", "danger");
       return;
     }
@@ -362,6 +526,7 @@ document.addEventListener("DOMContentLoaded", function () {
       id: Date.now(),
       username,
       email,
+      parentEmail,
       password: "12345678",
       role: "student",
       gender,
@@ -375,6 +540,7 @@ document.addEventListener("DOMContentLoaded", function () {
     addStudentToTeacher(newStudent.studentId);
     newStudentName.value = "";
     newStudentEmail.value = "";
+    newStudentParentEmail.value = "";
     newStudentGender.value = "";
     newStudentGrade.value = "";
     addStudentModal.hide();

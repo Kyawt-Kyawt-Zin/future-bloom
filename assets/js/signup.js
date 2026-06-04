@@ -6,19 +6,21 @@ const inputFormElement = document.getElementById("signUpForm");
 const usernameElement = document.getElementById("username");
 const emailElement = document.getElementById("email");
 const passwordElement = document.getElementById("password");
+const confirmPasswordElement = document.getElementById("confirmPassword");
 const togglePasswordBtn = document.getElementById("togglePassword");
+const toggleConfirmPasswordBtn = document.getElementById(
+  "toggleConfirmPassword",
+);
 
 togglePasswordBtn.addEventListener("click", function () {
-  const eyeIcon = document.getElementById("eye-icon");
-  const passwordType = passwordElement.getAttribute("type");
+  togglePasswordVisibility(passwordElement, document.getElementById("eye-icon"));
+});
 
-  if (passwordType === "password") {
-    passwordElement.setAttribute("type", "text");
-  } else {
-    passwordElement.setAttribute("type", "password");
-  }
-
-  eyeIcon.classList.toggle("bi-eye");
+toggleConfirmPasswordBtn.addEventListener("click", function () {
+  togglePasswordVisibility(
+    confirmPasswordElement,
+    document.getElementById("confirm-eye-icon"),
+  );
 });
 
 inputFormElement.addEventListener("submit", function (event) {
@@ -31,7 +33,7 @@ inputFormElement.addEventListener("submit", function (event) {
   const username = usernameElement.value.trim();
   const email = emailElement.value.trim();
   const password = passwordElement.value.trim();
-  const role = document.getElementById("role").value;
+  const confirmPassword = confirmPasswordElement.value.trim();
 
   if (username === "") {
     errorMessages.push("Username is required");
@@ -45,6 +47,10 @@ inputFormElement.addEventListener("submit", function (event) {
     errorMessages.push("Password is required");
   }
 
+  if (confirmPassword === "") {
+    errorMessages.push("Confirm password is required");
+  }
+
   if (password && password.length < 6) {
     errorMessages.push("Password should be at least 6 characters!");
   }
@@ -53,8 +59,8 @@ inputFormElement.addEventListener("submit", function (event) {
     errorMessages.push("Password should be no more than 20 characters!");
   }
 
-  if (role === "") {
-    errorMessages.push("Role is required");
+  if (password !== confirmPassword) {
+    errorMessages.push("Password and confirm password must match");
   }
 
   if (errorMessages.length > 0) {
@@ -84,7 +90,7 @@ inputFormElement.addEventListener("submit", function (event) {
     username,
     email,
     password,
-    role,
+    role: "teacher",
     gender: null,
     studentId: null,
   };
@@ -104,4 +110,16 @@ inputFormElement.addEventListener("submit", function (event) {
   }, 3000);
 });
 
-function handleRoleChange() {}
+function togglePasswordVisibility(inputElement, iconElement) {
+  const passwordType = inputElement.getAttribute("type");
+
+  if (passwordType === "password") {
+    inputElement.setAttribute("type", "text");
+    iconElement.classList.remove("bi-eye-slash");
+    iconElement.classList.add("bi-eye");
+  } else {
+    inputElement.setAttribute("type", "password");
+    iconElement.classList.remove("bi-eye");
+    iconElement.classList.add("bi-eye-slash");
+  }
+}

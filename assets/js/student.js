@@ -1,9 +1,16 @@
 console.log("student.js connected");
 
 document.addEventListener("DOMContentLoaded", function () {
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  let currentUser = JSON.parse(localStorage.getItem("currentUser"));
   const welcomeMessage = document.getElementById("welcomeMessage");
   const studentAlert = document.getElementById("studentAlert");
+  const studentProfileDetails = document.getElementById(
+    "studentProfileDetails",
+  );
+  const changePasswordForm = document.getElementById("changePasswordForm");
+  const changePasswordMessage = document.getElementById(
+    "changePasswordMessage",
+  );
   const studentScheduleList = document.getElementById("studentScheduleList");
   const studentAssignmentList = document.getElementById("studentAssignmentList");
   const studentReportList = document.getElementById("studentReportList");
@@ -16,8 +23,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const pendingAssignmentSelect = document.getElementById(
     "pendingAssignmentSelect",
   );
+  const assignmentFile = document.getElementById("assignmentFile");
 
   if (!currentUser || !welcomeMessage) return;
+
+  currentUser = getFreshCurrentUser();
+  localStorage.setItem("currentUser", JSON.stringify(currentUser));
 
   welcomeMessage.innerHTML = `
     <h3 class="fw-bold">
@@ -45,13 +56,18 @@ document.addEventListener("DOMContentLoaded", function () {
   `;
 
   renderStudentRecords();
+  renderStudentProfile();
+  setupPasswordToggles();
+
+  if (changePasswordForm) {
+    changePasswordForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      changeStudentPassword();
+    });
+  }
 
   if (submitAssignmentDemoBtn) {
     submitAssignmentDemoBtn.addEventListener("click", function () {
-      const selectedAssignmentTitle =
-        pendingAssignmentSelect.options[pendingAssignmentSelect.selectedIndex]
-          ?.text || "";
-
       if (!pendingAssignmentSelect.value) {
         submitAssignmentMessage.innerHTML = `
           <div class="alert alert-warning rounded-3 mb-0">
@@ -61,14 +77,214 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
+      if (!assignmentFile.files.length) {
+        submitAssignmentMessage.innerHTML = `
+          <div class="alert alert-warning rounded-3 mb-0">
+            Please choose an assignment file first.
+          </div>
+        `;
+        return;
+      }
+
+      const assignmentId = Number(pendingAssignmentSelect.value);
+      const fileName = assignmentFile.files[0].name;
+      const submittedAt = new Date().toISOString().split("T")[0];
+      const assignments = JSON.parse(localStorage.getItem("assignments")) || [];
+
+      const updatedAssignments = assignments.map(function (assignment) {
+        if (assignment.id === assignmentId) {
+          return {
+            ...assignment,
+            status: "submitted",
+            submitted: true,
+            submittedFileName: fileName,
+            submittedAt,
+          };
+        }
+
+        return assignment;
+      });
+
+      localStorage.setItem("assignments", JSON.stringify(updatedAssignments));
+
       submitAssignmentMessage.innerHTML = `
-        <div class="alert alert-info rounded-3 mb-0">
-          Demo feature: your selected file is marked for
-          <strong>${selectedAssignmentTitle}</strong>.
-          Real file upload will be available in a future version.
+        <div class="alert alert-success rounded-3 mb-0">
+          Assignment submitted successfully with file:
+          <strong>${fileName}</strong>.
+          Your teacher can now review it.
         </div>
       `;
+
+      assignmentFile.value = "";
+      renderStudentRecords();
     });
+  }
+
+  function getFreshCurrentUser() {
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const freshUser = users.find(function (user) {
+      return (
+        user.id === currentUser.id ||
+        (user.studentId && user.studentId === currentUser.studentId) ||
+        user.email === currentUser.email
+      );
+    });
+
+    return freshUser || currentUser;
+  }
+
+  function renderStudentProfile() {
+    if (!studentProfileDetails) return;
+
+    studentProfileDetails.innerHTML = `
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle mb-0">
+          <tbody>
+            <tr>
+              <th class="table-success">Name</th>
+              <td>${currentUser.username || "Not selected"}</td>
+            </tr>
+            <tr>
+              <th class="table-success">Email</th>
+              <td>${currentUser.email || "Not selected"}</td>
+            </tr>
+            <tr>
+              <th class="table-success">Student ID</th>
+              <td>${currentUser.studentId || "Not selected"}</td>
+            </tr>
+            <tr>
+              <th class="table-success">Parent Email</th>
+              <td>${currentUser.parentEmail || "Not selected"}</td>
+            </tr>
+            <tr>
+              <th class="table-success">Grade</th>
+              <td>${currentUser.grade || "Not selected"}</td>
+            </tr>
+            <tr>
+              <th class="table-success">Gender</th>
+              <td>${currentUser.gender || "Not selected"}</td>
+            </tr>
+            <tr>
+              <th class="table-success">Role</th>
+              <td>${currentUser.role || "student"}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  function setupPasswordToggles() {
+    const passwordToggleBtns = document.querySelectorAll(
+      ".password-toggle-btn",
+    );
+
+    passwordToggleBtns.forEach(function (button) {
+      button.addEventListener("click", function () {
+        const inputElement = document.getElementById(
+          button.dataset.passwordTarget,
+        );
+        const iconElement = document.getElementById(button.dataset.iconTarget);
+
+        togglePasswordVisibility(inputElement, iconElement);
+      });
+    });
+  }
+
+  function togglePasswordVisibility(inputElement, iconElement) {
+    if (!inputElement || !iconElement) return;
+
+    if (inputElement.type === "password") {
+      inputElement.type = "text";
+      iconElement.classList.remove("bi-eye-slash");
+      iconElement.classList.add("bi-eye");
+      return;
+    }
+
+    inputElement.type = "password";
+    iconElement.classList.remove("bi-eye");
+    iconElement.classList.add("bi-eye-slash");
+  }
+
+  function changeStudentPassword() {
+    const currentPassword = document
+      .getElementById("currentPassword")
+      .value.trim();
+    const newPassword = document.getElementById("newPassword").value.trim();
+    const confirmNewPassword = document
+      .getElementById("confirmNewPassword")
+      .value.trim();
+    const errorMessages = [];
+
+    changePasswordMessage.innerHTML = "";
+
+    if (currentPassword === "") {
+      errorMessages.push("Current password is required.");
+    }
+
+    if (newPassword === "") {
+      errorMessages.push("New password is required.");
+    }
+
+    if (confirmNewPassword === "") {
+      errorMessages.push("Confirm password is required.");
+    }
+
+    if (newPassword && newPassword.length < 6) {
+      errorMessages.push("New password should be at least 6 characters.");
+    }
+
+    if (newPassword.length > 20) {
+      errorMessages.push("New password should be no more than 20 characters.");
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      errorMessages.push("New password and confirm password must match.");
+    }
+
+    if (currentPassword !== currentUser.password) {
+      errorMessages.push("Current password is incorrect.");
+    }
+
+    if (errorMessages.length > 0) {
+      changePasswordMessage.innerHTML = `
+        <div class="alert alert-danger rounded-3">
+          ${errorMessages.join("<br />")}
+        </div>
+      `;
+      return;
+    }
+
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const updatedUsers = users.map(function (user) {
+      if (
+        user.id === currentUser.id ||
+        (user.studentId && user.studentId === currentUser.studentId)
+      ) {
+        return {
+          ...user,
+          password: newPassword,
+        };
+      }
+
+      return user;
+    });
+
+    currentUser = {
+      ...currentUser,
+      password: newPassword,
+    };
+
+    localStorage.setItem("users", JSON.stringify(updatedUsers));
+    localStorage.setItem("currentUser", JSON.stringify(currentUser));
+
+    changePasswordMessage.innerHTML = `
+      <div class="alert alert-success rounded-3">
+        Password changed successfully.
+      </div>
+    `;
+
+    changePasswordForm.reset();
   }
 
   function renderStudentRecords() {
@@ -170,8 +386,8 @@ document.addEventListener("DOMContentLoaded", function () {
         <tr>
           <td>${schedule.subject}</td>
           <td>${schedule.day}</td>
-          <td>${schedule.startTime}</td>
-          <td>${schedule.endTime}</td>
+          <td>${formatTime(schedule.startTime)}</td>
+          <td>${formatTime(schedule.endTime)}</td>
         </tr>
       `;
     });
@@ -193,6 +409,18 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
   }
 
+  function formatTime(timeValue) {
+    if (!timeValue) return "-";
+
+    const timeParts = timeValue.split(":");
+    const hour = Number(timeParts[0]);
+    const minute = timeParts[1];
+    const period = hour >= 12 ? "PM" : "AM";
+    const hour12 = hour % 12 || 12;
+
+    return `${hour12}:${minute} ${period}`;
+  }
+
   function renderAssignmentTable(assignments) {
     if (assignments.length === 0) {
       return `<p class="text-muted mb-0">No assignments yet.</p>`;
@@ -204,8 +432,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const today = new Date().toISOString().split("T")[0];
       const isOverdue =
         assignment.status === "pending" && assignment.deadline < today;
-      const statusClass =
-        assignment.status === "complete" ? "text-success" : "text-warning";
+      const statusClass = getAssignmentStatusClass(assignment.status);
+      const submittedFile = assignment.submittedFileName || "Not submitted";
+      const submittedAt = assignment.submittedAt || "-";
 
       rows += `
         <tr class="${isOverdue ? "table-danger" : ""}">
@@ -216,6 +445,8 @@ document.addEventListener("DOMContentLoaded", function () {
             ${assignment.status}
             ${isOverdue ? "<span class='text-danger'>(Overdue)</span>" : ""}
           </td>
+          <td>${submittedFile}</td>
+          <td>${submittedAt}</td>
         </tr>
       `;
     });
@@ -229,12 +460,20 @@ document.addEventListener("DOMContentLoaded", function () {
               <th>Subject</th>
               <th>Deadline</th>
               <th>Status</th>
+              <th>Submitted File</th>
+              <th>Submitted Date</th>
             </tr>
           </thead>
           <tbody>${rows}</tbody>
         </table>
       </div>
     `;
+  }
+
+  function getAssignmentStatusClass(status) {
+    if (status === "complete") return "text-success";
+    if (status === "submitted") return "text-primary";
+    return "text-warning";
   }
 
   function renderReportCardTable(reportCards) {

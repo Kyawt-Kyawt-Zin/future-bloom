@@ -26,6 +26,7 @@
       "role": "student",
       "gender": "girl",
       "studentId": "STU84817",
+      "parentEmail": "kyawt@gmail.com",
       "grade": "Grade 7"
     },
     {
@@ -45,6 +46,7 @@
       "role": "student",
       "gender": "boy",
       "studentId": "STU16217",
+      "parentEmail": "george@gmail.com",
       "grade": "Grade 8"
     },
     {
@@ -73,6 +75,7 @@
       "role": "student",
       "gender": "girl",
       "studentId": "STU76533",
+      "parentEmail": "kyawt@gmail.com",
       "grade": "Grade 6"
     },
     {
@@ -83,6 +86,7 @@
       "role": "student",
       "gender": "boy",
       "studentId": "STU57465",
+      "parentEmail": "george@gmail.com",
       "grade": "Grade 7"
     }
   ],

@@ -139,20 +139,28 @@
               </div>
             </div>
 
-            <!-- make selection for your Role  -->
             <div class="mb-3">
-              <label for="role" class="form-label">Select your role:</label>
+              <label for="confirmPassword" class="form-label">
+                Confirm Password
+              </label>
 
-              <select
-                name="selectRole"
-                id="role"
-                class="form-select"
-                onchange="handleRoleChange()"
-              >
-                <option value="" selected disabled>--- Select Role ---</option>
-                <option value="parent">Parent</option>
-                <option value="teacher">Teacher</option>
-              </select>
+              <div class="col-sm-10">
+                <div class="input-group">
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    id="confirmPassword"
+                    class="form-control"
+                  />
+                  <button
+                    class="btn btn-primary"
+                    type="button"
+                    id="toggleConfirmPassword"
+                  >
+                    <i class="bi bi-eye-slash" id="confirm-eye-icon"></i>
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div class="text-center py-4">

@@ -73,6 +73,9 @@ document.addEventListener("DOMContentLoaded", function () {
   studentInfo.innerHTML = `
     <h3 class="fw-bold mb-2">Accessing ${student.username}</h3>
     <p class="mb-1"><strong>Student ID:</strong> ${student.studentId}</p>
+    <p class="mb-1">
+      <strong>Parent Email:</strong> ${student.parentEmail || "Not selected"}
+    </p>
     <p class="mb-0"><strong>Grade:</strong> ${
       student.grade || "Not selected"
     }</p>
@@ -266,6 +269,7 @@ document.addEventListener("DOMContentLoaded", function () {
         day,
         startTime,
         endTime,
+        teacherId: currentUser.id,
       });
 
       localStorage.setItem("schedules", JSON.stringify(schedules));
@@ -306,6 +310,7 @@ document.addEventListener("DOMContentLoaded", function () {
       subject,
       deadline,
       status,
+      teacherId: currentUser.id,
     });
 
     localStorage.setItem("assignments", JSON.stringify(assignments));
@@ -399,9 +404,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const updatedAssignments = assignments.map(function (assignment) {
       if (assignment.id === assignmentId) {
+        if (!isOwnedByCurrentTeacher(assignment)) {
+          return assignment;
+        }
+
         return {
           ...assignment,
-          status: assignment.status === "complete" ? "pending" : "complete",
+          status: assignment.status === "complete" ? "submitted" : "complete",
         };
       }
 
@@ -422,6 +431,15 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     if (!schedule) return;
+
+    if (!isOwnedByCurrentTeacher(schedule)) {
+      scheduleMessage.innerHTML = `
+        <div class="alert alert-warning rounded-3">
+          This schedule was added by another teacher, so you can view it but cannot edit it.
+        </div>
+      `;
+      return;
+    }
 
     editingScheduleId = schedule.id;
     scheduleSubject.value = schedule.subject;
@@ -446,6 +464,10 @@ document.addEventListener("DOMContentLoaded", function () {
     scheduleForm.reset();
     editingScheduleId = null;
     scheduleSaveBtn.textContent = "Save Schedule";
+  }
+
+  function isOwnedByCurrentTeacher(record) {
+    return String(record.teacherId) === String(currentUser.id);
   }
 
   function renderRecords() {
@@ -478,20 +500,24 @@ document.addEventListener("DOMContentLoaded", function () {
     let rows = "";
 
     schedules.forEach(function (schedule) {
-      rows += `
-        <tr>
-          <td>${schedule.subject}</td>
-          <td>${schedule.day}</td>
-          <td>${schedule.startTime}</td>
-          <td>${schedule.endTime}</td>
-          <td>
+      const scheduleAction = isOwnedByCurrentTeacher(schedule)
+        ? `
             <button
               class="btn btn-sm btn-outline-success edit-schedule-btn"
               data-schedule-id="${schedule.id}"
             >
               Edit
             </button>
-          </td>
+          `
+        : `<span class="badge text-bg-secondary">View only</span>`;
+
+      rows += `
+        <tr>
+          <td>${schedule.subject}</td>
+          <td>${schedule.day}</td>
+          <td>${formatTime(schedule.startTime)}</td>
+          <td>${formatTime(schedule.endTime)}</td>
+          <td>${scheduleAction}</td>
         </tr>
       `;
     });
@@ -514,6 +540,18 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
   }
 
+  function formatTime(timeValue) {
+    if (!timeValue) return "-";
+
+    const timeParts = timeValue.split(":");
+    const hour = Number(timeParts[0]);
+    const minute = timeParts[1];
+    const period = hour >= 12 ? "PM" : "AM";
+    const hour12 = hour % 12 || 12;
+
+    return `${hour12}:${minute} ${period}`;
+  }
+
   function renderAssignmentTable(assignments) {
     if (assignments.length === 0) {
       return `<p class="text-muted">No assignments added yet.</p>`;
@@ -522,10 +560,26 @@ document.addEventListener("DOMContentLoaded", function () {
     let rows = "";
 
     assignments.forEach(function (assignment) {
-      const statusClass =
-        assignment.status === "complete" ? "text-success" : "text-warning";
+      const statusClass = getAssignmentStatusClass(assignment.status);
       const buttonText =
-        assignment.status === "complete" ? "Mark Pending" : "Mark Complete";
+        assignment.status === "complete" ? "Mark Submitted" : "Mark Complete";
+      const submittedFile = assignment.submittedFileName || "Not submitted";
+      const submittedAt = assignment.submittedAt || "-";
+      let assignmentAction = `<span class="badge text-bg-secondary">View only</span>`;
+
+      if (isOwnedByCurrentTeacher(assignment)) {
+        assignmentAction =
+          assignment.status === "pending"
+            ? `<span class="badge text-bg-warning">Waiting</span>`
+            : `
+                <button
+                  class="btn btn-sm btn-outline-success change-status-btn"
+                  data-assignment-id="${assignment.id}"
+                >
+                  ${buttonText}
+                </button>
+              `;
+      }
 
       rows += `
         <tr>
@@ -533,14 +587,9 @@ document.addEventListener("DOMContentLoaded", function () {
           <td>${assignment.subject}</td>
           <td>${assignment.deadline}</td>
           <td class="fw-bold ${statusClass}">${assignment.status}</td>
-          <td>
-            <button
-              class="btn btn-sm btn-outline-success change-status-btn"
-              data-assignment-id="${assignment.id}"
-            >
-              ${buttonText}
-            </button>
-          </td>
+          <td>${submittedFile}</td>
+          <td>${submittedAt}</td>
+          <td>${assignmentAction}</td>
         </tr>
       `;
     });
@@ -554,6 +603,8 @@ document.addEventListener("DOMContentLoaded", function () {
               <th>Subject</th>
               <th>Deadline</th>
               <th>Status</th>
+              <th>Submitted File</th>
+              <th>Submitted Date</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -561,6 +612,12 @@ document.addEventListener("DOMContentLoaded", function () {
         </table>
       </div>
     `;
+  }
+
+  function getAssignmentStatusClass(status) {
+    if (status === "complete") return "text-success";
+    if (status === "submitted") return "text-primary";
+    return "text-warning";
   }
 
   function renderReportCardTable(reportCards) {
