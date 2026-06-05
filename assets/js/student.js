@@ -17,6 +17,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const submitAssignmentDemoBtn = document.getElementById(
     "submitAssignmentDemoBtn",
   );
+  const submitAssignmentSection = document.getElementById(
+    "submitAssignmentSection",
+  );
   const submitAssignmentMessage = document.getElementById(
     "submitAssignmentMessage",
   );
@@ -285,6 +288,16 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
 
     changePasswordForm.reset();
+    hideBootstrapModal("changePasswordModal");
+  }
+
+  function hideBootstrapModal(modalId) {
+    const modalElement = document.getElementById(modalId);
+
+    if (!modalElement) return;
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+    modal.hide();
   }
 
   function renderStudentRecords() {
@@ -320,6 +333,7 @@ document.addEventListener("DOMContentLoaded", function () {
     pendingAssignmentSelect.innerHTML = "";
 
     if (pendingAssignments.length === 0) {
+      submitAssignmentSection.classList.add("d-none");
       pendingAssignmentSelect.innerHTML = `
         <option value="">No pending assignments</option>
       `;
@@ -327,6 +341,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
+    submitAssignmentSection.classList.remove("d-none");
     submitAssignmentDemoBtn.disabled = false;
 
     pendingAssignmentSelect.innerHTML = `
@@ -336,7 +351,7 @@ document.addEventListener("DOMContentLoaded", function () {
     pendingAssignments.forEach(function (assignment) {
       pendingAssignmentSelect.innerHTML += `
         <option value="${assignment.id}">
-          ${assignment.title} - ${assignment.subject} - Due ${assignment.deadline}
+          ${assignment.title} - ${assignment.subject} - Due ${formatDate(assignment.deadline)}
         </option>
       `;
     });
@@ -440,7 +455,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <tr class="${isOverdue ? "table-danger" : ""}">
           <td>${assignment.title}</td>
           <td>${assignment.subject}</td>
-          <td>${assignment.deadline}</td>
+          <td>${formatDate(assignment.deadline)}</td>
           <td class="fw-bold ${statusClass}">
             ${assignment.status}
             ${isOverdue ? "<span class='text-danger'>(Overdue)</span>" : ""}
@@ -474,6 +489,16 @@ document.addEventListener("DOMContentLoaded", function () {
     if (status === "complete") return "text-success";
     if (status === "submitted") return "text-primary";
     return "text-warning";
+  }
+
+  function formatDate(dateValue) {
+    if (!dateValue) return "-";
+
+    const dateParts = dateValue.split("-");
+
+    if (dateParts.length !== 3) return dateValue;
+
+    return `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
   }
 
   function renderReportCardTable(reportCards) {

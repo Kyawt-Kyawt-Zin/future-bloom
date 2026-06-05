@@ -81,6 +81,115 @@ h6 {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
 }
 
+.schedule-time-done-btn {
+  display: none;
+}
+
+.schedule-time-done-btn.show {
+  display: inline-block;
+}
+
+.admin-body {
+  background: #f4f6f8;
+}
+
+.admin-login-view {
+  min-height: 100vh;
+  background: linear-gradient(rgba(7, 40, 24, 0.72), rgba(7, 40, 24, 0.72)),
+    url(../../images/green.jpg) no-repeat center center fixed;
+  background-size: cover;
+}
+
+.admin-login-card {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(25, 135, 84, 0.35);
+  border-radius: 18px;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.28);
+}
+
+.admin-shell {
+  min-height: calc(100vh - 58px);
+  display: grid;
+  grid-template-columns: 280px 1fr;
+}
+
+.admin-sidebar {
+  background: #f8f9fb;
+  border-right: 1px solid #dee2e6;
+  min-height: calc(100vh - 58px);
+}
+
+.admin-brand {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px;
+  color: #111827;
+  text-decoration: none;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.admin-brand-icon {
+  font-size: 1.6rem;
+}
+
+.admin-control-title {
+  padding: 14px 18px 8px;
+  color: #6c757d;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+.admin-menu .list-group-item {
+  border-left: 0;
+  border-right: 0;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.admin-menu .list-group-item.active {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.admin-main {
+  min-width: 0;
+}
+
+.admin-topbar {
+  min-height: 72px;
+  background: #ffffff;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 24px;
+}
+
+.admin-content {
+  padding: 24px;
+}
+
+.admin-panel {
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 0.5rem 1rem rgba(15, 23, 42, 0.08);
+}
+
+.admin-footer {
+  background: #ffffff;
+}
+
 .fb-dark-mode {
   color: #f8f9fa;
 }
@@ -97,9 +206,57 @@ h6 {
 .fb-dark-mode .navbar,
 .fb-dark-mode .card,
 .fb-dark-mode .alert,
+.fb-dark-mode .admin-stat-card,
+.fb-dark-mode .admin-topbar,
+.fb-dark-mode .admin-panel,
+.fb-dark-mode .admin-footer,
 .fb-dark-mode footer {
   background-color: #1f2933 !important;
   color: #f8f9fa;
+}
+
+.fb-dark-mode .admin-sidebar {
+  background: #111827;
+  border-color: #4b5563;
+}
+
+.fb-dark-mode .admin-brand {
+  color: #f8f9fa;
+  border-color: #4b5563;
+}
+
+@media (max-width: 991.98px) {
+  .admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-sidebar {
+    min-height: auto;
+  }
+
+  .admin-brand {
+    min-height: 64px;
+  }
+
+  .admin-menu {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .admin-menu {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-content {
+    padding: 16px;
+  }
 }
 
 .fb-dark-mode .table {

@@ -1,6 +1,15 @@
 {
   "users": [
     {
+      "id": 1001,
+      "username": "Admin",
+      "email": "admin@futurebloom.com",
+      "password": "12345678",
+      "role": "admin",
+      "gender": null,
+      "studentId": null
+    },
+    {
       "id": 1779197744303,
       "username": "Kyawt",
       "email": "kyawt@gmail.com",

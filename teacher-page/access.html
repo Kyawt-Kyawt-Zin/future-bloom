@@ -158,22 +158,42 @@
                   </select>
                 </div>
 
-                <div class="mb-3">
-                  <label for="scheduleStartTime" class="form-label">
-                    Start Time
-                  </label>
-                  <input
-                    type="time"
-                    id="scheduleStartTime"
-                    class="form-control"
-                  />
-                </div>
+                <div class="row g-3 mb-3">
+                  <div class="col-12 col-md-6">
+                    <label for="scheduleStartTime" class="form-label">
+                      Start Time
+                    </label>
+                    <div class="input-group schedule-time-control">
+                      <input
+                        type="time"
+                        id="scheduleStartTime"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
 
-                <div class="mb-3">
-                  <label for="scheduleEndTime" class="form-label">
-                    End Time
-                  </label>
-                  <input type="time" id="scheduleEndTime" class="form-control" />
+                  <div class="col-12 col-md-6">
+                    <label for="scheduleEndTime" class="form-label">
+                      End Time
+                    </label>
+                    <div class="input-group schedule-time-control">
+                      <input
+                        type="time"
+                        id="scheduleEndTime"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="col-12 text-end">
+                    <button
+                      id="scheduleTimeDoneBtn"
+                      class="btn btn-outline-success btn-sm schedule-time-done-btn"
+                      type="button"
+                    >
+                      Done
+                    </button>
+                  </div>
                 </div>
 
                 <button type="submit" class="btn btn-success w-100">

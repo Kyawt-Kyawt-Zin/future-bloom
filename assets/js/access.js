@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
   localStorage.setItem("lastTeacherUser", JSON.stringify(currentUser));
 
   setupAccessFormButtons();
+  setupTimeDoneButtons();
   renderSubjectOptions();
 
   backToTeacherBtn.addEventListener("click", function () {
@@ -176,6 +177,32 @@ document.addEventListener("DOMContentLoaded", function () {
     return String(value).toLowerCase().replace(/\s+/g, "");
   }
 
+  function setupTimeDoneButtons() {
+    const scheduleTimeDoneBtn = document.getElementById("scheduleTimeDoneBtn");
+    const timeInputs = [scheduleStartTime, scheduleEndTime];
+
+    timeInputs.forEach(function (timeInput) {
+      timeInput.addEventListener("focus", function () {
+        showTimeDoneButton();
+      });
+
+      timeInput.addEventListener("click", function () {
+        showTimeDoneButton();
+      });
+    });
+
+    scheduleTimeDoneBtn.addEventListener("click", function () {
+      scheduleStartTime.blur();
+      scheduleEndTime.blur();
+      scheduleTimeDoneBtn.classList.remove("show");
+    });
+  }
+
+  function showTimeDoneButton() {
+    const scheduleTimeDoneBtn = document.getElementById("scheduleTimeDoneBtn");
+    scheduleTimeDoneBtn.classList.add("show");
+  }
+
   function setupAccessFormButtons() {
     const formButtons = document.querySelectorAll(".access-form-btn");
     const collapseItems = [
@@ -282,6 +309,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     resetScheduleForm();
+    hideBootstrapCollapse("scheduleCollapse");
     renderRecords();
   });
 
@@ -323,6 +351,7 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
 
     assignmentForm.reset();
+    hideBootstrapCollapse("assignmentCollapse");
     renderRecords();
   });
 
@@ -382,6 +411,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     reportForm.reset();
     reportGrade.value = "";
+    hideBootstrapCollapse("reportCollapse");
     renderRecords();
   });
 
@@ -465,6 +495,15 @@ document.addEventListener("DOMContentLoaded", function () {
     scheduleForm.reset();
     editingScheduleId = null;
     scheduleSaveBtn.textContent = "Save Schedule";
+  }
+
+  function hideBootstrapCollapse(collapseId) {
+    const collapseElement = document.getElementById(collapseId);
+
+    if (!collapseElement) return;
+
+    const collapse = bootstrap.Collapse.getOrCreateInstance(collapseElement);
+    collapse.hide();
   }
 
   function isOwnedByCurrentTeacher(record) {
@@ -586,7 +625,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <tr>
           <td>${assignment.title}</td>
           <td>${assignment.subject}</td>
-          <td>${assignment.deadline}</td>
+          <td>${formatDate(assignment.deadline)}</td>
           <td class="fw-bold ${statusClass}">${assignment.status}</td>
           <td>${submittedFile}</td>
           <td>${submittedAt}</td>
@@ -619,6 +658,16 @@ document.addEventListener("DOMContentLoaded", function () {
     if (status === "complete") return "text-success";
     if (status === "submitted") return "text-primary";
     return "text-warning";
+  }
+
+  function formatDate(dateValue) {
+    if (!dateValue) return "-";
+
+    const dateParts = dateValue.split("-");
+
+    if (dateParts.length !== 3) return dateValue;
+
+    return `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
   }
 
   function renderReportCardTable(reportCards) {

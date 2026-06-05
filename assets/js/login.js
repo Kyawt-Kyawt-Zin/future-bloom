@@ -66,6 +66,10 @@ function login(event) {
 }
 
 function getRedirectPath(user) {
+  if (user.role === "admin") {
+    return "admin-page/index.html";
+  }
+
   if (user.role === "parent") {
     return "parent-page/index.html";
   }

@@ -289,6 +289,16 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
 
     teacherChangePasswordForm.reset();
+    hideBootstrapModal("teacherChangePasswordModal");
+  }
+
+  function hideBootstrapModal(modalId) {
+    const modalElement = document.getElementById(modalId);
+
+    if (!modalElement) return;
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+    modal.hide();
   }
 
   function getAllStudents() {
