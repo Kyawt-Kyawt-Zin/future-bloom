@@ -1,7 +1,7 @@
 console.log("admin.js connected");
 
 document.addEventListener("DOMContentLoaded", function () {
-  let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  let currentUser = JSON.parse(sessionStorage.getItem("adminCurrentUser"));
   const adminLoginView = document.getElementById("adminLoginView");
   const adminDashboardView = document.getElementById("adminDashboardView");
   const adminFooter = document.getElementById("adminFooter");
@@ -18,6 +18,17 @@ document.addEventListener("DOMContentLoaded", function () {
   const adminQuickStats = document.getElementById("adminQuickStats");
   const adminDataView = document.getElementById("adminDataView");
   const adminTabBtns = document.querySelectorAll(".admin-tab-btn");
+  const adminLogoutBtn = document.getElementById("adminLogoutBtn");
+  const mainSubjects = [
+    "English",
+    "Mathematics",
+    "Science",
+    "History",
+    "Geography",
+    "Economics",
+  ];
+  const studentsPerPage = 5;
+  let studentCurrentPage = 1;
 
   setupAdminLogin();
 
@@ -34,6 +45,11 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       button.classList.add("active");
+
+      if (button.dataset.adminTab === "students") {
+        studentCurrentPage = 1;
+      }
+
       renderAdminTab(button.dataset.adminTab);
     });
   });
@@ -71,10 +87,16 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       currentUser = matchedAdmin;
-      localStorage.setItem("currentUser", JSON.stringify(matchedAdmin));
+      sessionStorage.setItem("adminCurrentUser", JSON.stringify(matchedAdmin));
       adminLoginForm.reset();
       adminLoginMessage.innerHTML = "";
       showAdminDashboard();
+    });
+
+    adminLogoutBtn.addEventListener("click", function () {
+      sessionStorage.removeItem("adminCurrentUser");
+      currentUser = null;
+      showAdminLogin();
     });
 
     toggleAdminPassword.addEventListener("click", function () {
@@ -147,6 +169,7 @@ document.addEventListener("DOMContentLoaded", function () {
       teachers: renderTeachers,
       students: renderStudents,
       subjects: renderSubjects,
+      additionalSubjects: renderAdditionalSubjects,
       schedules: renderSchedules,
       assignments: renderAssignments,
       reports: renderReports,
@@ -181,8 +204,8 @@ document.addEventListener("DOMContentLoaded", function () {
     setHeader("Dashboard", "Overview", "School summary");
     renderStats([
       ["Teachers", data.teachers.length, "bi-person-workspace"],
-      ["Students", data.students.length, "bi-mortarboard"],
-      ["Subjects", data.subjects.length, "bi-journal-bookmark"],
+      ["Student Count", data.students.length, "bi-mortarboard"],
+      ["Main Subjects", mainSubjects.length, "bi-journal-bookmark"],
       ["Families", families.size, "bi-people"],
       ["Schedules", data.schedules.length, "bi-calendar-week"],
       ["Submitted Work", submittedAssignments.length, "bi-upload"],
@@ -206,7 +229,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setHeader("Teachers", "Staff Records", `Total teachers: ${data.teachers.length}`);
     renderStats([
       ["Teachers", data.teachers.length, "bi-person-workspace"],
-      ["Linked Students", data.links.length, "bi-diagram-3"],
+      ["Student Count", data.links.length, "bi-diagram-3"],
     ]);
 
     const rows = data.teachers
@@ -226,7 +249,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .join("");
 
     adminDataView.innerHTML = renderTable(
-      ["Teacher Name", "Email", "Students"],
+      ["Teacher Name", "Email", "Student Count"],
       rows,
       "No teachers found.",
     );
@@ -240,7 +263,13 @@ document.addEventListener("DOMContentLoaded", function () {
       ["Parent Emails", countUnique(data.students, "parentEmail"), "bi-envelope"],
     ]);
 
-    const rows = data.students
+    const totalPages = Math.ceil(data.students.length / studentsPerPage);
+    const startIndex = (studentCurrentPage - 1) * studentsPerPage;
+    const studentsToShow = data.students.slice(
+      startIndex,
+      startIndex + studentsPerPage,
+    );
+    const rows = studentsToShow
       .map(function (student) {
         return `
           <tr>
@@ -254,22 +283,25 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .join("");
 
-    adminDataView.innerHTML = renderTable(
+    adminDataView.innerHTML =
+      renderTable(
       ["Student Name", "Student ID", "Grade", "Email", "Parent Email"],
       rows,
       "No students found.",
-    );
+      ) + renderStudentPagination(totalPages);
+
+    setupStudentPagination();
   }
 
   function renderSubjects(data) {
-    setHeader("Subjects", "Academic Records", `Total subjects: ${data.subjects.length}`);
+    setHeader("Main Subjects", "Academic Records", `Total main subjects: ${mainSubjects.length}`);
     renderStats([
-      ["Subjects", data.subjects.length, "bi-journal-bookmark"],
+      ["Main Subjects", mainSubjects.length, "bi-journal-bookmark"],
       ["Schedules", data.schedules.length, "bi-calendar-week"],
       ["Assignments", data.assignments.length, "bi-clipboard-check"],
     ]);
 
-    const rows = data.subjects
+    const rows = mainSubjects
       .map(function (subject) {
         const scheduleCount = data.schedules.filter(function (schedule) {
           return schedule.subject === subject;
@@ -295,6 +327,59 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
+  function renderAdditionalSubjects(data) {
+    const customSubjects = JSON.parse(localStorage.getItem("customSubjects")) || [];
+    const additionalSubjects = [...new Set(customSubjects)].filter(function (
+      subject,
+    ) {
+      return !isMainSubject(subject);
+    });
+    const additionalSchedules = data.schedules.filter(function (schedule) {
+      return additionalSubjects.includes(schedule.subject);
+    });
+    const additionalAssignments = data.assignments.filter(function (
+      assignment,
+    ) {
+      return additionalSubjects.includes(assignment.subject);
+    });
+
+    setHeader(
+      "Additional Subjects",
+      "Teacher Added Records",
+      `Total additional subjects: ${additionalSubjects.length}`,
+    );
+    renderStats([
+      ["Additional Subjects", additionalSubjects.length, "bi-plus-square"],
+      ["Schedules", additionalSchedules.length, "bi-calendar-week"],
+      ["Assignments", additionalAssignments.length, "bi-clipboard-check"],
+    ]);
+
+    const rows = additionalSubjects
+      .map(function (subject) {
+        const scheduleCount = data.schedules.filter(function (schedule) {
+          return schedule.subject === subject;
+        }).length;
+        const assignmentCount = data.assignments.filter(function (assignment) {
+          return assignment.subject === subject;
+        }).length;
+
+        return `
+          <tr>
+            <td>${subject}</td>
+            <td>${scheduleCount}</td>
+            <td>${assignmentCount}</td>
+          </tr>
+        `;
+      })
+      .join("");
+
+    adminDataView.innerHTML = renderTable(
+      ["Additional Subject", "Schedules", "Assignments"],
+      rows,
+      "No additional subjects added yet.",
+    );
+  }
+
   function renderSchedules(data) {
     setHeader("Schedules", "Class Time Records", `Total schedules: ${data.schedules.length}`);
     renderStats([
@@ -309,14 +394,14 @@ document.addEventListener("DOMContentLoaded", function () {
             <td>${schedule.subject}</td>
             <td>${schedule.day}</td>
             <td>${formatTime(schedule.startTime)} - ${formatTime(schedule.endTime)}</td>
-            <td>${schedule.studentId}</td>
+            <td>${getStudentDisplay(schedule.studentId, data.students)}</td>
           </tr>
         `;
       })
       .join("");
 
     adminDataView.innerHTML = renderTable(
-      ["Subject", "Day", "Class Hours", "Student ID"],
+      ["Subject", "Day", "Class Hours", "Student"],
       rows,
       "No schedules found.",
     );
@@ -340,7 +425,7 @@ document.addEventListener("DOMContentLoaded", function () {
           <tr>
             <td>${assignment.title}</td>
             <td>${assignment.subject}</td>
-            <td>${assignment.studentId}</td>
+            <td>${getStudentDisplay(assignment.studentId, data.students)}</td>
             <td>${formatDate(assignment.deadline)}</td>
             <td>${assignment.status}</td>
           </tr>
@@ -349,7 +434,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .join("");
 
     adminDataView.innerHTML = renderTable(
-      ["Title", "Subject", "Student ID", "Deadline", "Status"],
+      ["Title", "Subject", "Student", "Deadline", "Status"],
       rows,
       "No assignments found.",
     );
@@ -366,7 +451,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .map(function (reportCard) {
         return `
           <tr>
-            <td>${reportCard.studentId}</td>
+            <td>${getStudentDisplay(reportCard.studentId, data.students)}</td>
             <td>${reportCard.month}</td>
             <td>${reportCard.subject}</td>
             <td>${reportCard.marks}</td>
@@ -377,7 +462,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .join("");
 
     adminDataView.innerHTML = renderTable(
-      ["Student ID", "Month", "Subject", "Marks", "Grade"],
+      ["Student", "Month", "Subject", "Marks", "Grade"],
       rows,
       "No report cards found.",
     );
@@ -401,6 +486,72 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
       })
       .join("");
+  }
+
+  function renderStudentPagination(totalPages) {
+    if (totalPages <= 1) return "";
+
+    let buttons = "";
+
+    if (studentCurrentPage > 1) {
+      buttons += `
+        <button class="btn btn-outline-success btn-sm admin-student-page-btn" data-page="${
+          studentCurrentPage - 1
+        }">
+          Previous
+        </button>
+      `;
+    }
+
+    for (let page = 1; page <= totalPages; page++) {
+      buttons += `
+        <button
+          class="btn btn-sm ${
+            page === studentCurrentPage ? "btn-success" : "btn-outline-success"
+          } admin-student-page-btn"
+          data-page="${page}"
+        >
+          ${page}
+        </button>
+      `;
+    }
+
+    if (studentCurrentPage < totalPages) {
+      buttons += `
+        <button class="btn btn-outline-success btn-sm admin-student-page-btn" data-page="${
+          studentCurrentPage + 1
+        }">
+          Next
+        </button>
+      `;
+    }
+
+    return `
+      <div class="d-flex flex-wrap gap-2 justify-content-center mt-3">
+        ${buttons}
+      </div>
+    `;
+  }
+
+  function setupStudentPagination() {
+    const pageButtons = document.querySelectorAll(".admin-student-page-btn");
+
+    pageButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        studentCurrentPage = Number(button.dataset.page);
+        renderStudents(getAdminData());
+      });
+    });
+  }
+
+  function getStudentDisplay(studentId, students) {
+    const student = students.find(function (item) {
+      return item.studentId === studentId;
+    });
+
+    if (!student) return studentId || "Not selected";
+
+    return `${student.username} - ${student.studentId}`;
   }
 
   function renderTable(headers, rows, emptyMessage) {
@@ -512,6 +663,16 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     return [...subjectSet];
+  }
+
+  function isMainSubject(subject) {
+    return mainSubjects.some(function (mainSubject) {
+      return normalizeText(mainSubject) === normalizeText(subject);
+    });
+  }
+
+  function normalizeText(value) {
+    return String(value).toLowerCase().replace(/\s+/g, "");
   }
 
   function countUnique(items, key) {
